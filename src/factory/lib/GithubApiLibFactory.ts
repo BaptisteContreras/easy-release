@@ -1,12 +1,16 @@
 import GitHub from 'github-api';
 
 export default class GithubApiLibFactory {
-  readonly AUTH_METHOD = 'oauth';
+  /**            Properties           * */
 
-  createGithubApiLib(apiToken : String) : GitHub {
+  private static AUTH_METHOD = 'oauth';
+
+  /**            Methods           * */
+
+  public static createGithubApiLib(apiToken : String) : GitHub {
     return new GitHub({
       token: apiToken,
-      auth: this.AUTH_METHOD,
+      auth: GithubApiLibFactory.AUTH_METHOD,
     });
   }
 }

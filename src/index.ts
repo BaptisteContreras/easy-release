@@ -1,11 +1,6 @@
-import GithubIssue from './model/github/GithubIssue';
-import GithubOwner from './model/github/GithubOwner';
+import RepositoryFactory from './factory/repository/RepositoryFactory';
+import GithubConfiguration from './model/configuration/GithubConfiguration';
 
-const world = 'worldjkskldsklskl';
-
-export default function hello(word: string = world): string {
-  const a = word;
-  return `Hello ${world}! ${a} `;
-}
-const test = new GithubIssue('', '', [], new GithubOwner('', ''));
-console.log(hello(world));
+const configuration = new GithubConfiguration('TEST', 'TEST', '123');
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const repositoryFactory = new RepositoryFactory(configuration);
