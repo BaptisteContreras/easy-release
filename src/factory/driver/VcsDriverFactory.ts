@@ -1,4 +1,4 @@
-import GithubVcsDriver from '../../tools/driver/vcs/GithubVcsDriver';
+import GithubVcsDriver from '../../utils/driver/vcs/GithubVcsDriver';
 import AbstractVcsConfiguration from '../../model/configuration/AbstractVcsConfiguration';
 import GithubApiLibFactory from '../lib/GithubApiLibFactory';
 

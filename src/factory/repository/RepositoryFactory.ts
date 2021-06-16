@@ -1,5 +1,5 @@
 import AbstractVcsConfiguration from '../../model/configuration/AbstractVcsConfiguration';
-import GithubRepository from '../../tools/repository/GithubRepository';
+import GithubRepository from '../../utils/repository/GithubRepository';
 import VcsDriverFactory from '../driver/VcsDriverFactory';
 
 export default class RepositoryFactory {

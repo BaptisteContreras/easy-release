@@ -1,16 +1,18 @@
 import RepositoryFactory from './factory/repository/RepositoryFactory';
 import AbstractVcsConfiguration from './model/configuration/AbstractVcsConfiguration';
+import AbstractVcsRepository from './utils/repository/AbstractVcsRepository';
 
 export default class EasyReleasePackager {
   /**            Properties           * */
 
   // @ts-ignore
-  private repositoryFactory : RepositoryFactory;
+  private repository : AbstractVcsRepository;
 
   // @ts-ignore
   private vcsConfiguration : AbstractVcsConfiguration;
 
-  constructor() {
+  constructor(repository : AbstractVcsRepository) {
+    this.repository = repository;
     this.configure();
   }
 

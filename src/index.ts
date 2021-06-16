@@ -2,6 +2,9 @@ import EasyReleasePackager from './EasyReleasePackager';
 
 import OptionsDefinition from './model/options/OptionsDefinition';
 import UsageDefinition from './model/options/UsageDefinition';
+import MainFactory from './factory/MainFactory';
+import ConfigurationReader from './utils/configuration/ConfigurationReader';
+import ConfigurationReaderFactory from './factory/configuration/ConfigurationReaderFactory';
 
 const commandLineArgs = require('command-line-args');
 const commandLineUsage = require('command-line-usage');
@@ -16,7 +19,11 @@ if (options.help) {
   return 0;
 }
 
-const packager = new EasyReleasePackager();
+ConfigurationReaderFactory.createConfigurationReader(true)
+  .readConfiguration(
+    'C:\\Users\\Baptiste\\Desktop\\test\\', 'recette', 'config-', 'json',
+  );
+// const packager = MainFactory.createApplication();
 
 console.log(options);
 
