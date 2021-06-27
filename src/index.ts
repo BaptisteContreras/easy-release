@@ -1,9 +1,6 @@
-import EasyReleasePackager from './EasyReleasePackager';
-
 import OptionsDefinition from './model/options/OptionsDefinition';
 import UsageDefinition from './model/options/UsageDefinition';
 import MainFactory from './factory/MainFactory';
-import ConfigurationReader from './utils/configuration/ConfigurationReader';
 import ConfigurationReaderFactory from './factory/configuration/ConfigurationReaderFactory';
 
 const commandLineArgs = require('command-line-args');
@@ -12,6 +9,7 @@ require('dotenv').config({ path: `${process.cwd()}/../config/.env` });
 
 const options = commandLineArgs(OptionsDefinition);
 
+console.log(typeof options);
 if (options.help) {
   console.log(commandLineUsage(UsageDefinition));
 
@@ -19,11 +17,17 @@ if (options.help) {
   return 0;
 }
 
-ConfigurationReaderFactory.createConfigurationReader(true)
+const configuration = ConfigurationReaderFactory.createConfigurationReader(
+  options.noConfigurationValidation !== false,
+)
   .readConfiguration(
-    'C:\\Users\\Baptiste\\Desktop\\test\\', 'recette', 'config-', 'json',
+    options.configurationFilePath,
+    options.profile,
+    options.baseConfigurationName ?? 'config-',
+    options.configurationFileExtension ?? 'json',
   );
-// const packager = MainFactory.createApplication();
+
+const packager = MainFactory.createApplication(configuration, options);
 
 console.log(options);
 

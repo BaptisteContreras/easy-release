@@ -1,4 +1,5 @@
 import AbstractVcsDriver from '../driver/vcs/AbstractVcsDriver';
+import VcsEnum from '../../model/enum/VcsEnum';
 
 export default abstract class AbstractVcsRepository {
   /**            Properties           * */

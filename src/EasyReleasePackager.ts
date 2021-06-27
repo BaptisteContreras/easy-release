@@ -1,34 +1,40 @@
-import RepositoryFactory from './factory/repository/RepositoryFactory';
-import AbstractVcsConfiguration from './model/configuration/AbstractVcsConfiguration';
 import AbstractVcsRepository from './utils/repository/AbstractVcsRepository';
+import Configuration from './model/configuration/Configuration';
 
 export default class EasyReleasePackager {
   /**            Properties           * */
 
-  // @ts-ignore
   private repository : AbstractVcsRepository;
 
-  // @ts-ignore
-  private vcsConfiguration : AbstractVcsConfiguration;
+  private configuration : Configuration;
 
-  constructor(repository : AbstractVcsRepository) {
+  private commandLineOptions : object;
+
+  private currentWorkDirectory : string;
+
+  constructor(
+    repository : AbstractVcsRepository, configuration : Configuration, commandLineOptions : object,
+  ) {
     this.repository = repository;
+    this.configuration = configuration;
+    this.commandLineOptions = commandLineOptions;
+    this.currentWorkDirectory = '';
+
     this.configure();
   }
 
+  // eslint-disable-next-line class-methods-use-this
   configure() : void {
-    // @ts-ignore
-    this.repositoryFactory = null;
-    console.log(process.env.TEST);
+    // this.currentWorkDirectory = this.commandLineOptions.currentWorkDirectory ?? '.';
   }
 
+  // eslint-disable-next-line class-methods-use-this
   startPackage() : void {
-    // @ts-ignore
-    this.repositoryFactory = null;
+
   }
 
+  // eslint-disable-next-line class-methods-use-this
   resumePackage() : void {
-    // @ts-ignore
-    this.repositoryFactory = null;
+
   }
 }

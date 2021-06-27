@@ -1,4 +1,4 @@
-import GitHub from 'github-api';
+const GitHub = require('github-api');
 
 export default class GithubApiLibFactory {
   /**            Properties           * */

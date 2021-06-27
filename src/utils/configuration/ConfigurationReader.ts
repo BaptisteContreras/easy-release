@@ -2,10 +2,10 @@ import Configuration from '../../model/configuration/Configuration';
 import ConfigurationDriver from '../driver/configuration/ConfigurationDriver';
 import JsonConfigurationDriver from '../driver/configuration/JsonConfigurationDriver';
 import AbstractVcsConfiguration from '../../model/configuration/AbstractVcsConfiguration';
-import ConfigurationSchema from '../../model/configuration/ConfigurationSchema';
 import Vcs from '../../model/constant/Vcs';
 import GithubConfiguration from '../../model/configuration/GithubConfiguration';
 import ConfigurationValidator from './ConfigurationValidator';
+import schemaDeclaration from '../../model/configuration/ConfigurationSchema';
 
 const fs = require('fs');
 
@@ -37,7 +37,7 @@ export default class ConfigurationReader {
       .parseConfiguration(rawConfiguration);
 
     const validationErrors = this.configurationValidator.validateConfiguration(
-      ConfigurationSchema, parsedConfiguration,
+      schemaDeclaration, parsedConfiguration,
 
     );
 
@@ -87,7 +87,7 @@ export default class ConfigurationReader {
 
   private static getVcsConfiguration(parsedConfiguration : object) : AbstractVcsConfiguration {
     // @ts-ignore
-    switch (parsedConfiguration[ConfigurationSchema.VCS_TYPE.name]) {
+    switch (parsedConfiguration[schemaDeclaration.VCS_TYPE.name]) {
       case Vcs.GITHUB:
         return GithubConfiguration.buildFromParsedConfiguration(parsedConfiguration);
       default: throw new Error('Only GITHUB is a supported VCS');
