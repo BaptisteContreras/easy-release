@@ -5,7 +5,7 @@ export default class GithubLabel extends AbstractLabel {
   /**            Constructor           * */
 
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor
-  constructor(name: String, url: String, owner : GithubOwner) {
-    super(name, url, owner);
+  constructor(name: String, url: String) {
+    super(name, url);
   }
 }

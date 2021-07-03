@@ -6,14 +6,11 @@ export default abstract class AbstractLabel {
 
   protected url: String;
 
-  protected owner : AbstractOwner;
-
   /**            Constructor           * */
 
-  protected constructor(name: String, url: String, owner : AbstractOwner) {
+  protected constructor(name: String, url: String) {
     this.name = name;
     this.url = url;
-    this.owner = owner;
   }
 
   /**            Accessors           * */
@@ -24,9 +21,5 @@ export default abstract class AbstractLabel {
 
   protected getUrl(): String {
     return this.name;
-  }
-
-  protected getOwner(): AbstractOwner {
-    return this.owner;
   }
 }

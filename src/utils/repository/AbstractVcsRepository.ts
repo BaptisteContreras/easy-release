@@ -21,6 +21,11 @@ export default abstract class AbstractVcsRepository {
   /** Returns the list of all MR to deliver * */
   async getMrToDeliver() : Promise<void> {
     const mrList = await this.vcsDriver.getOpenMrs();
-    console.log(mrList);
+    const issues = await Promise.all(mrList.map(async (mr) => {
+      const issue = await this.vcsDriver.getLinkedIssue(mr);
+
+      return issue;
+    }));
+    console.log(issues);
   }
 }
