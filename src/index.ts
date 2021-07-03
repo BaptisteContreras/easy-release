@@ -1,13 +1,14 @@
-import OptionsDefinition from './model/options/OptionsDefinition';
 import UsageDefinition from './model/options/UsageDefinition';
 import MainFactory from './factory/MainFactory';
 import ConfigurationReaderFactory from './factory/configuration/ConfigurationReaderFactory';
+import CliOptionsValidator from './utils/configuration/CliOptionsValidator';
+import { CliOptions, optionsCliDefinitions } from './model/options/OptionsDefinition';
 
 const commandLineArgs = require('command-line-args');
 const commandLineUsage = require('command-line-usage');
 require('dotenv').config({ path: `${process.cwd()}/../config/.env` });
 
-const options = commandLineArgs(OptionsDefinition);
+const options : CliOptions = commandLineArgs(optionsCliDefinitions);
 
 console.log(typeof options);
 if (options.help) {
@@ -17,8 +18,16 @@ if (options.help) {
   return 0;
 }
 
+const cliErrors = CliOptionsValidator.validateRequiredCliOptions(options, optionsCliDefinitions);
+if (cliErrors.length) {
+  console.error(cliErrors);
+
+  // @ts-ignore
+  return 1;
+}
+
 const configuration = ConfigurationReaderFactory.createConfigurationReader(
-  options.noConfigurationValidation !== false,
+  options.noConfigurationValidation,
 )
   .readConfiguration(
     options.configurationFilePath,

@@ -1,4 +1,5 @@
 import AbstractVcsConfiguration from './AbstractVcsConfiguration';
+import { RawConfiguration } from './ConfigurationSchema';
 
 export default class Configuration {
   /**            Properties           * */
@@ -13,7 +14,8 @@ export default class Configuration {
   /**            Methods           * */
 
   public static buildFromParsedConfiguration(
-    vcsConfiguration: AbstractVcsConfiguration, parsedConfiguration : object,
+    vcsConfiguration: AbstractVcsConfiguration,
+    parsedConfiguration: RawConfiguration,
   ) : Configuration {
     return new Configuration(vcsConfiguration);
   }

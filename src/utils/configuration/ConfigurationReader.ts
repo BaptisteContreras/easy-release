@@ -5,7 +5,7 @@ import AbstractVcsConfiguration from '../../model/configuration/AbstractVcsConfi
 import Vcs from '../../model/constant/Vcs';
 import GithubConfiguration from '../../model/configuration/GithubConfiguration';
 import ConfigurationValidator from './ConfigurationValidator';
-import schemaDeclaration from '../../model/configuration/ConfigurationSchema';
+import schemaDeclaration, { RawConfiguration } from '../../model/configuration/ConfigurationSchema';
 
 const fs = require('fs');
 
@@ -85,7 +85,9 @@ export default class ConfigurationReader {
     }
   }
 
-  private static getVcsConfiguration(parsedConfiguration : object) : AbstractVcsConfiguration {
+  private static getVcsConfiguration(
+    parsedConfiguration : RawConfiguration,
+  ) : AbstractVcsConfiguration {
     // @ts-ignore
     switch (parsedConfiguration[schemaDeclaration.VCS_TYPE.name]) {
       case Vcs.GITHUB:
