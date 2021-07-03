@@ -7,6 +7,21 @@ const schemaDeclaration = {
     required: true,
     type: 'string',
   } as ConfigurationSchema,
+  API_TOKEN: {
+    name: 'API_TOKEN',
+    required: true,
+    type: 'string',
+  } as ConfigurationSchema,
+  ORGANISATION_NAME: {
+    name: 'ORGANISATION_NAME',
+    required: true,
+    type: 'string',
+  } as ConfigurationSchema,
+  REPOSITORY_NAME: {
+    name: 'REPOSITORY_NAME',
+    required: true,
+    type: 'string',
+  } as ConfigurationSchema,
 };
 
 export interface ConfigurationSchema {
@@ -17,7 +32,10 @@ export interface ConfigurationSchema {
 }
 
 export interface RawConfiguration {
-  VCS_TYPE : string
+  VCS_TYPE : string,
+  API_TOKEN : string,
+  ORGANISATION_NAME : string,
+  REPOSITORY_NAME : string,
 }
 
 export default schemaDeclaration;

@@ -7,7 +7,7 @@ export default class GithubApiLibFactory {
 
   /**            Methods           * */
 
-  public static createGithubApiLib(apiToken : String) : GitHub {
+  public static createGithubApiLib(apiToken : String) : any {
     return new GitHub({
       token: apiToken,
       auth: GithubApiLibFactory.AUTH_METHOD,

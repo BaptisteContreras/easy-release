@@ -7,9 +7,9 @@ export default interface AbstractVcsDriver {
   getIssuesLinkedTo(linkedMrs: AbstractMergeRequest[]) : AbstractIssue[];
 
   /** Returns the list of all issues linked to an open MR * */
-  getIssuesLinked() : AbstractIssue[];
+  getIssuesLinked(linkedMr: AbstractMergeRequest) : AbstractIssue[];
 
   /** Returns the list of all open MR * */
-  getOpenMrs() : AbstractMergeRequest[];
+  getOpenMrs() : Promise<AbstractMergeRequest[]>;
 
 }

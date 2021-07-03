@@ -30,7 +30,7 @@ if (cliErrors.length) {
 console.log(options);
 
 const configuration = ConfigurationReaderFactory.createConfigurationReader(
-  options.noConfigurationValidation,
+  !options.noConfigurationValidation,
 )
   .readConfiguration(
     options.configurationFilePath,
@@ -41,6 +41,7 @@ const configuration = ConfigurationReaderFactory.createConfigurationReader(
 
 const logger = LoggerFactory.createLogger(configuration);
 logger.info('Logger created and ready !');
+
 const packager = MainFactory.createApplication(configuration, logger);
 
 console.log(configuration);

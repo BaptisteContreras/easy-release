@@ -33,5 +33,6 @@ export default class EasyReleasePackager {
 
   run() : void {
     this.logger.info('EasyReleasePackager run');
+    this.repository.getMrToDeliver();
   }
 }
