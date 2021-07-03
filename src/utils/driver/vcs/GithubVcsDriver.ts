@@ -2,6 +2,7 @@ import GitHub from 'github-api';
 import AbstractVcsDriver from './AbstractVcsDriver';
 import AbstractIssue from '../../../model/common/AbstractIssue';
 import AbstractMergeRequest from '../../../model/common/AbstractMergeRequest';
+import LoggerInterface from '../../logger/LoggerInterface';
 
 export default class GithubVcsDriver implements AbstractVcsDriver {
   /**            Properties           * */
@@ -11,10 +12,16 @@ export default class GithubVcsDriver implements AbstractVcsDriver {
 
   private organisationName : string;
 
-  constructor(githubLib: GitHub, repositoryName: string, organisationName: string) {
+  private logger : LoggerInterface;
+
+  constructor(
+    githubLib: GitHub, repositoryName: string, organisationName: string, logger : LoggerInterface,
+  ) {
     this.githubLib = githubLib;
     this.repositoryName = repositoryName;
     this.organisationName = organisationName;
+    this.logger = logger;
+    logger.info('GithubVcsDriver created');
   }
 
   /**            Methods           * */

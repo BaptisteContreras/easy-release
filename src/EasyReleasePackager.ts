@@ -1,5 +1,6 @@
 import AbstractVcsRepository from './utils/repository/AbstractVcsRepository';
 import Configuration from './model/configuration/Configuration';
+import LoggerInterface from './utils/logger/LoggerInterface';
 
 export default class EasyReleasePackager {
   /**            Properties           * */
@@ -8,24 +9,16 @@ export default class EasyReleasePackager {
 
   private configuration : Configuration;
 
-  private commandLineOptions : object;
-
-  private currentWorkDirectory : string;
+  private logger : LoggerInterface;
 
   constructor(
-    repository : AbstractVcsRepository, configuration : Configuration, commandLineOptions : object,
+    repository : AbstractVcsRepository, configuration : Configuration, logger : LoggerInterface,
   ) {
     this.repository = repository;
     this.configuration = configuration;
-    this.commandLineOptions = commandLineOptions;
-    this.currentWorkDirectory = '';
+    this.logger = logger;
 
-    this.configure();
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  configure() : void {
-    // this.currentWorkDirectory = this.commandLineOptions.currentWorkDirectory ?? '.';
+    this.logger.info('EasyReleasePackager application created !');
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -36,5 +29,9 @@ export default class EasyReleasePackager {
   // eslint-disable-next-line class-methods-use-this
   resumePackage() : void {
 
+  }
+
+  run() : void {
+    this.logger.info('EasyReleasePackager run');
   }
 }

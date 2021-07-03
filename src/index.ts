@@ -27,6 +27,8 @@ if (cliErrors.length) {
   return 1;
 }
 
+console.log(options);
+
 const configuration = ConfigurationReaderFactory.createConfigurationReader(
   options.noConfigurationValidation,
 )
@@ -39,10 +41,11 @@ const configuration = ConfigurationReaderFactory.createConfigurationReader(
 
 const logger = LoggerFactory.createLogger(configuration);
 logger.info('Logger created and ready !');
-const packager = MainFactory.createApplication(configuration, options);
+const packager = MainFactory.createApplication(configuration, logger);
 
 console.log(configuration);
-console.log(options);
+
+packager.run();
 
 // @ts-ignore
 return 0;
