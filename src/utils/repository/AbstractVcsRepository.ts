@@ -1,6 +1,7 @@
 import AbstractVcsDriver from '../driver/vcs/AbstractVcsDriver';
 import VcsEnum from '../../model/enum/VcsEnum';
 import LoggerInterface from '../logger/LoggerInterface';
+import AbstractMergeRequest from '../../model/common/AbstractMergeRequest';
 
 export default abstract class AbstractVcsRepository {
   /**            Properties           * */
@@ -19,7 +20,7 @@ export default abstract class AbstractVcsRepository {
   }
 
   /** Returns the list of all MR to deliver * */
-  async getMrToDeliver() : Promise<void> {
+  async getMrToDeliver(deliverLabels : string[]) : Promise<AbstractMergeRequest[]> {
     const mrList = await this.vcsDriver.getOpenMrs();
     await Promise.all(mrList.map(async (mr) => {
       const issue = await this.vcsDriver.getLinkedIssue(mr);
@@ -28,6 +29,7 @@ export default abstract class AbstractVcsRepository {
         this.logger.debug(`Link issue #${issue.getNumber()} to MR ${mr.getTitle()}`);
       }
     }));
-    console.log(mrList);
+
+    return mrList.filter((mr) => mr.getLinkedIssue()?.hasAtLeastOneLabel(deliverLabels));
   }
 }

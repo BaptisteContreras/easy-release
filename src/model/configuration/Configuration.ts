@@ -15,12 +15,15 @@ export default class Configuration {
 
   private profile : string;
 
+  private labelsDeliver : string[];
+
   /**            Constructor           * */
-  constructor(vcsConfiguration: AbstractVcsConfiguration) {
+  constructor(vcsConfiguration: AbstractVcsConfiguration, labelsDeliver : string[]) {
     this.vcsConfiguration = vcsConfiguration;
     this.verbose = false;
     this.currentWorkDirectory = '.';
     this.configurationFilePath = '.';
+    this.labelsDeliver = labelsDeliver;
     this.profile = 'recette';
   }
 
@@ -30,7 +33,7 @@ export default class Configuration {
     vcsConfiguration: AbstractVcsConfiguration,
     parsedConfiguration: RawConfiguration,
   ) : Configuration {
-    return new Configuration(vcsConfiguration);
+    return new Configuration(vcsConfiguration, parsedConfiguration.LABELS_DELIVER_NAME);
   }
 
   /** Merge the CLI option with the parsed application's configuration * */
@@ -54,5 +57,9 @@ export default class Configuration {
 
   getProfile() : string {
     return this.profile;
+  }
+
+  getLabelsDeliver() : string[] {
+    return this.labelsDeliver;
   }
 }

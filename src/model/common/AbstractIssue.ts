@@ -14,6 +14,7 @@ export default abstract class AbstractIssue {
   protected id: number;
 
   protected number: number;
+
   /**            Constructor           * */
 
   protected constructor(
@@ -26,6 +27,25 @@ export default abstract class AbstractIssue {
     this.owner = owner;
     this.id = id;
     this.number = number;
+  }
+
+  /**            Methods           * */
+
+  /** Return true if the issue has the given label (search by label name) * */
+  hasLabel(labelName : string) : boolean {
+    return this.labels.find((label) => label.getName() === labelName) !== undefined;
+  }
+
+  /** Return true if the issue has at least, one label in the given list * */
+  hasAtLeastOneLabel(labelsName : string[]) : boolean {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const labelKey of labelsName) {
+      if (this.hasLabel(labelKey)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**            Accessors           * */

@@ -19,19 +19,19 @@ export default abstract class AbstractLabel {
 
   /**            Accessors           * */
 
-  protected getName(): String {
+  public getName(): String {
     return this.name;
   }
 
-  protected getUrl(): String {
+  public getUrl(): String {
     return this.name;
   }
 
-  protected getId(): number {
+  public getId(): number {
     return this.id;
   }
 
-  protected getDescription(): String {
+  public getDescription(): String {
     return this.description;
   }
 }

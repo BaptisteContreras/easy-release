@@ -31,8 +31,13 @@ export default class EasyReleasePackager {
 
   }
 
-  run() : void {
+  async run() : Promise<void> {
     this.logger.info('EasyReleasePackager run');
-    this.repository.getMrToDeliver();
+    this.logger.info('Fetch MR to deliver');
+    const mrToDeliver = await this.repository.getMrToDeliver(this.configuration.getLabelsDeliver());
+    this.logger.info(`${mrToDeliver.length} MR to deliver found`);
+
+    console.log('MR to deliver');
+    console.log(mrToDeliver);
   }
 }

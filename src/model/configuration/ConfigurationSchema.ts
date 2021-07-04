@@ -22,6 +22,11 @@ const schemaDeclaration = {
     required: true,
     type: 'string',
   } as ConfigurationSchema,
+  LABELS_DELIVER_NAME: {
+    name: 'LABELS_DELIVER_NAME',
+    required: true,
+    type: 'array',
+  } as ConfigurationSchema,
 };
 
 export interface ConfigurationSchema {
@@ -36,6 +41,7 @@ export interface RawConfiguration {
   API_TOKEN : string,
   ORGANISATION_NAME : string,
   REPOSITORY_NAME : string,
+  LABELS_DELIVER_NAME : string[],
 }
 
 export default schemaDeclaration;
