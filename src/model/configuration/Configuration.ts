@@ -17,6 +17,10 @@ export default class Configuration {
 
   private labelsDeliver : string[];
 
+  private release : boolean;
+
+  private resume : boolean;
+
   /**            Constructor           * */
   constructor(vcsConfiguration: AbstractVcsConfiguration, labelsDeliver : string[]) {
     this.vcsConfiguration = vcsConfiguration;
@@ -25,6 +29,8 @@ export default class Configuration {
     this.configurationFilePath = '.';
     this.labelsDeliver = labelsDeliver;
     this.profile = 'recette';
+    this.release = false;
+    this.resume = false;
   }
 
   /**            Methods           * */
@@ -42,6 +48,8 @@ export default class Configuration {
     this.currentWorkDirectory = cliOptions.currentWorkDirectory;
     this.configurationFilePath = cliOptions.configurationFilePath;
     this.profile = cliOptions.profile;
+    this.resume = cliOptions.resume;
+    this.release = cliOptions.release;
 
     return this;
   }
@@ -61,5 +69,13 @@ export default class Configuration {
 
   getLabelsDeliver() : string[] {
     return this.labelsDeliver;
+  }
+
+  isRelease() : boolean {
+    return this.release;
+  }
+
+  isResume() : boolean {
+    return this.resume;
   }
 }

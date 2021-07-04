@@ -3,7 +3,7 @@ export interface OptionDefinitionElement {
   alias: string,
   description: string,
   required: boolean,
-  type: Object | StringConstructor,
+  type: Object | StringConstructor | BooleanConstructor,
 }
 
 export interface CliOptions {
@@ -15,6 +15,8 @@ export interface CliOptions {
   profile : string,
   baseConfigurationName : string,
   configurationFileExtension : string,
+  release : boolean,
+  resume : boolean,
 }
 
 const optionsCliDefinition = [
@@ -70,6 +72,18 @@ const optionsCliDefinition = [
     type: String,
     required: false,
     description: 'Set the configuration file\'s extension',
+  } as OptionDefinitionElement,
+  {
+    name: 'release',
+    type: Boolean,
+    required: false,
+    description: 'Start the release process',
+  } as OptionDefinitionElement,
+  {
+    name: 'resume',
+    type: Boolean,
+    required: false,
+    description: 'Resume the release process',
   } as OptionDefinitionElement,
 ];
 // type CliOption =
