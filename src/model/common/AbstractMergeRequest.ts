@@ -1,13 +1,13 @@
-import AbstractOwner from './AbstractOwner';
+import AbstractUser from './AbstractUser';
 import AbstractIssue from './AbstractIssue';
 
 export default abstract class AbstractMergeRequest {
   /**            Properties           * */
-  protected name: String;
+  protected title: String;
 
   protected url: String;
 
-  protected owner : AbstractOwner;
+  protected owner : AbstractUser;
 
   protected body : string;
 
@@ -24,11 +24,11 @@ export default abstract class AbstractMergeRequest {
   /**            Constructor           * */
 
   protected constructor(
-    name: String, url: String, owner: AbstractOwner,
+    name: String, url: String, owner: AbstractUser,
     body: string, linkedIssueId: string,
     state: string, createdAt: Date, updatedAt: Date | null,
   ) {
-    this.name = name;
+    this.title = name;
     this.url = url;
     this.owner = owner;
     this.body = body;
@@ -41,15 +41,15 @@ export default abstract class AbstractMergeRequest {
 
   /**            Accessors           * */
 
-  getName(): String {
-    return this.name;
+  getTitle(): String {
+    return this.title;
   }
 
   getUrl(): String {
-    return this.name;
+    return this.title;
   }
 
-  getOwner(): AbstractOwner {
+  getOwner(): AbstractUser {
     return this.owner;
   }
 

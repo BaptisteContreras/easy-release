@@ -1,4 +1,4 @@
-import GitlabOwner from './GitlabOwner';
+import GitlabUser from './GitlabUser';
 import AbstractMergeRequest from '../common/AbstractMergeRequest';
 import AbstractIssue from '../common/AbstractIssue';
 import GitlabIssue from './GitlabIssue';
@@ -8,7 +8,7 @@ export default class MergeRequest extends AbstractMergeRequest {
 
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor
   constructor(
-    name: String, url: String, owner: GitlabOwner,
+    name: String, url: String, owner: GitlabUser,
     body: string,
     linkedIssueId: string, state: string,
     createdAt: Date, updatedAt: Date | null,

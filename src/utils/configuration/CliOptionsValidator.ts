@@ -10,7 +10,7 @@ export default class CliOptionsValidator {
     const errors = [];
     /**
     cliOptionsDefinition.forEach((definitionElement) => {
-      if (definitionElement.required && cliOptions[definitionElement.name]) {
+      if (definitionElement.required && cliOptions[definitionElement.title]) {
 
       }
     });

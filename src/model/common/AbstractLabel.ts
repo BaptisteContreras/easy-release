@@ -1,16 +1,20 @@
-import AbstractOwner from './AbstractOwner';
-
 export default abstract class AbstractLabel {
   /**            Properties           * */
   protected name: String;
 
   protected url: String;
 
+  protected id: number;
+
+  protected description: string;
+
   /**            Constructor           * */
 
-  protected constructor(name: String, url: String) {
+  constructor(name: String, url: String, id: number, description: string) {
     this.name = name;
     this.url = url;
+    this.id = id;
+    this.description = description;
   }
 
   /**            Accessors           * */
@@ -21,5 +25,13 @@ export default abstract class AbstractLabel {
 
   protected getUrl(): String {
     return this.name;
+  }
+
+  protected getId(): number {
+    return this.id;
+  }
+
+  protected getDescription(): String {
+    return this.description;
   }
 }

@@ -1,4 +1,4 @@
-import GithubOwner from './GithubOwner';
+import GithubUser from './GithubUser';
 import AbstractMergeRequest from '../common/AbstractMergeRequest';
 import AbstractIssue from '../common/AbstractIssue';
 import GithubIssue from './GithubIssue';
@@ -8,7 +8,7 @@ export default class PullRequest extends AbstractMergeRequest {
 
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor
   constructor(
-    name: String, url: String, owner: GithubOwner,
+    name: String, url: String, owner: GithubUser,
     body: string, linkedIssueId: string,
     state: string, createdAt: Date, updatedAt: Date | null,
   ) {

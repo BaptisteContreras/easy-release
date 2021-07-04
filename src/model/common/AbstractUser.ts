@@ -1,14 +1,16 @@
-export default abstract class AbstractOwner {
+export default abstract class AbstractUser {
   /**            Properties           * */
   protected name: String;
 
   protected url: String;
 
-  /**            Constructor           * */
+  protected id: number;
 
-  constructor(name: String, url: String) {
+  /**            Constructor           * */
+  constructor(name: String, url: String, id: number) {
     this.name = name;
     this.url = url;
+    this.id = id;
   }
 
   /**            Accessors           * */
@@ -19,5 +21,9 @@ export default abstract class AbstractOwner {
 
   protected getUrl(): String {
     return this.name;
+  }
+
+  protected getId(): number {
+    return this.id;
   }
 }

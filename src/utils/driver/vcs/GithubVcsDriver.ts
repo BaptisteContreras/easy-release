@@ -3,7 +3,7 @@ import AbstractIssue from '../../../model/common/AbstractIssue';
 import AbstractMergeRequest from '../../../model/common/AbstractMergeRequest';
 import LoggerInterface from '../../logger/LoggerInterface';
 import PullRequest from '../../../model/github/PullRequest';
-import GithubOwner from '../../../model/github/GithubOwner';
+import GithubUser from '../../../model/github/GithubUser';
 import GithubIssue from '../../../model/github/GithubIssue';
 import GithubLabel from '../../../model/github/GithubLabel';
 
@@ -20,6 +20,8 @@ export default class GithubVcsDriver implements AbstractVcsDriver {
   private repo : any;
 
   private issues : any;
+
+  /**            Constructor           * */
 
   constructor(
     githubLib: any, repositoryName: string, organisationName: string, logger : LoggerInterface,
@@ -39,18 +41,27 @@ export default class GithubVcsDriver implements AbstractVcsDriver {
   async getLinkedIssue(linkedMr: AbstractMergeRequest): Promise<AbstractIssue | null> {
     const linkedIssueId = linkedMr.getLinkedIssueId();
     if (!linkedIssueId) {
-      this.logger.warning(`PR ${linkedMr.getName()} has no linked issue ID. Add an #issueId in the PR's body to link an issue.`);
+      this.logger.warning(`PR ${linkedMr.getTitle()} has no linked issue ID. Add an #issueId in the PR's body to link an issue.`);
 
       return null;
     }
 
-    const rawIssue = (await this.getIssues().getIssue(linkedIssueId)).data;
+    try {
+      const rawIssue = (await this.getIssues().getIssue(linkedIssueId)).data;
+      if (!rawIssue) {
+        this.logger.warning(`PR ${linkedMr.getTitle()} linked to issue #${linkedIssueId} : Issue not found with Github API. Are you sure this issue ID is correct ?`);
 
-    if (!rawIssue) {
-      this.logger.warning(`PR ${linkedMr.getName()} linked to issue #${linkedIssueId} : Issue not found with Github API. Are you sure this issue ID is correct ?`);
+        return null;
+      }
+
+      this.logger.debug(`PR ${linkedMr.getTitle()} linked to issue #${linkedIssueId} : Issue found !`);
+
+      return GithubVcsDriver.buildIssue(rawIssue);
+    } catch (error) {
+      this.logger.warning(`PR ${linkedMr.getTitle()} linked to issue #${linkedIssueId} : Issue not found with Github API. Are you sure this issue ID is correct ?`);
+
+      return null;
     }
-
-    return GithubVcsDriver.buildIssue(rawIssue);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -101,27 +112,34 @@ export default class GithubVcsDriver implements AbstractVcsDriver {
     );
   }
 
+  /** Build a GithubIssue from a github-api issue object * */
   private static buildIssue(githubIssue : any) : GithubIssue {
     return new GithubIssue(
       githubIssue.title,
       githubIssue.url,
       githubIssue.labels.map((githubLabel : any) => this.buildLabel(githubLabel)),
       this.buildOwner(githubIssue.user),
+      githubIssue.id,
+      githubIssue.number,
     );
   }
 
+  /** Build a GithubLabel from a github-api label object * */
   private static buildLabel(githubLabel : any) : GithubLabel {
     return new GithubLabel(
       githubLabel.name,
       githubLabel.url,
+      githubLabel.id,
+      githubLabel.description,
     );
   }
 
-  /** Build a GithubOwner from a github-api user object * */
-  private static buildOwner(rawGithubOwner : any) : GithubOwner {
-    return new GithubOwner(
+  /** Build a GithubUser from a github-api user object * */
+  private static buildOwner(rawGithubOwner : any) : GithubUser {
+    return new GithubUser(
       rawGithubOwner.login,
       rawGithubOwner.html_url,
+      rawGithubOwner.id,
     );
   }
 
@@ -133,7 +151,8 @@ export default class GithubVcsDriver implements AbstractVcsDriver {
     if (bodyMatchs === null) {
       return '';
     }
-    console.log(bodyMatchs.length);
+
+    this.logger.debug(`body match : ${bodyMatchs.length}`);
     if (bodyMatchs.length > 1) {
       this.logger.warning(`${'Several linked issue ID found in a Github'
           + 'PR body : The first one will be chosen. PR body dump : ['}${githubPrBody}]`);

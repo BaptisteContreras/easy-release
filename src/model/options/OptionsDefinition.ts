@@ -63,7 +63,7 @@ const optionsCliDefinition = [
     name: 'baseConfigurationName',
     type: String,
     required: false,
-    description: 'Set the pattern for the beginning of the configuration file\'s name',
+    description: 'Set the pattern for the beginning of the configuration file\'s title',
   } as OptionDefinitionElement,
   {
     name: 'configurationFileExtension',
