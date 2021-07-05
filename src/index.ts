@@ -15,16 +15,14 @@ console.log(typeof options);
 if (options.help) {
   console.log(commandLineUsage(UsageDefinition));
 
-  // @ts-ignore
-  return 0;
+  process.exit(0);
 }
 
 const cliErrors = CliOptionsValidator.validateRequiredCliOptions(options, optionsCliDefinitions);
 if (cliErrors.length) {
   console.error(cliErrors);
 
-  // @ts-ignore
-  return 1;
+  process.exit(1);
 }
 
 console.log(options);
@@ -47,6 +45,3 @@ const packager = MainFactory.createApplication(configuration, logger);
 console.log(configuration);
 
 packager.run();
-
-// @ts-ignore
-return 0;

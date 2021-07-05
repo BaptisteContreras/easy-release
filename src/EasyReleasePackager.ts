@@ -1,7 +1,9 @@
-import { release } from 'os';
 import AbstractVcsRepository from './utils/repository/AbstractVcsRepository';
 import Configuration from './model/configuration/Configuration';
 import LoggerInterface from './utils/logger/LoggerInterface';
+import InformationDisplayer from './utils/display/InformationDisplayer';
+
+const term = require('terminal-kit').terminal;
 
 export default class EasyReleasePackager {
   /**            Properties           * */
@@ -27,9 +29,9 @@ export default class EasyReleasePackager {
     this.logger.info('Fetch MR to deliver');
     const mrToDeliver = await this.repository.getMrToDeliver(this.configuration.getLabelsDeliver());
     this.logger.info(`${mrToDeliver.length} MR to deliver found`);
-
     console.log('MR to deliver');
     console.log(mrToDeliver);
+    InformationDisplayer.displayMrToDeliver(mrToDeliver);
   }
 
   // eslint-disable-next-line class-methods-use-this

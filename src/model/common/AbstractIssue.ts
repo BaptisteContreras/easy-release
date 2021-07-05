@@ -48,6 +48,10 @@ export default abstract class AbstractIssue {
     return false;
   }
 
+  public displayAllLabels() : string {
+    return this.labels.map((label) => label.getName()).join(',');
+  }
+
   /**            Accessors           * */
 
   public getName(): String {
