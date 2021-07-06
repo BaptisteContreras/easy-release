@@ -2,6 +2,8 @@ import EasyReleasePackager from '../EasyReleasePackager';
 import Configuration from '../model/configuration/Configuration';
 import RepositoryFactory from './repository/RepositoryFactory';
 import LoggerInterface from '../utils/logger/LoggerInterface';
+import DisplayerFactory from './display/DisplayerFactory';
+import UserInteractionHandlerFactory from './interaction/UserInteractionHandlerFactory';
 
 export default class MainFactory {
   public static createApplication(
@@ -13,6 +15,8 @@ export default class MainFactory {
       (new RepositoryFactory(configuration.getVcsConfiguration(), logger)).createGithubRepository(),
       configuration,
       logger,
+      DisplayerFactory.createTerminalKitDisplayer(),
+      UserInteractionHandlerFactory.createTkInteractionHandler(),
     );
   }
 }

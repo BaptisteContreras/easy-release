@@ -21,12 +21,14 @@ export default abstract class AbstractMergeRequest {
 
   protected updatedAt : Date | null;
 
+  protected number : number;
+
   /**            Constructor           * */
 
   protected constructor(
     name: String, url: String, owner: AbstractUser,
-    body: string, linkedIssueId: string,
-    state: string, createdAt: Date, updatedAt: Date | null,
+    body: string, linkedIssueId: string, state: string,
+    createdAt: Date, updatedAt: Date | null, number : number,
   ) {
     this.title = name;
     this.url = url;
@@ -37,6 +39,7 @@ export default abstract class AbstractMergeRequest {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.linkedIssue = null;
+    this.number = number;
   }
 
   /**            Accessors           * */
@@ -79,6 +82,10 @@ export default abstract class AbstractMergeRequest {
 
   setLinkedIssue(issue : AbstractIssue) : void {
     this.linkedIssue = issue;
+  }
+
+  getNumber() : number {
+    return this.number;
   }
 
   public abstract isOpen() : boolean;

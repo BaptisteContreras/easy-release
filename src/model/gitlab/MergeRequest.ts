@@ -9,14 +9,13 @@ export default class MergeRequest extends AbstractMergeRequest {
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor
   constructor(
     name: String, url: String, owner: GitlabUser,
-    body: string,
-    linkedIssueId: string, state: string,
-    createdAt: Date, updatedAt: Date | null,
+    body: string, linkedIssueId: string, state: string,
+    createdAt: Date, updatedAt: Date | null, number : number,
   ) {
     super(
       name, url, owner,
       body, linkedIssueId, state,
-      createdAt, updatedAt,
+      createdAt, updatedAt, number,
     );
   }
 

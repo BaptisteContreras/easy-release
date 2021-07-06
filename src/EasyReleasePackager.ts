@@ -1,9 +1,10 @@
 import AbstractVcsRepository from './utils/repository/AbstractVcsRepository';
 import Configuration from './model/configuration/Configuration';
 import LoggerInterface from './utils/logger/LoggerInterface';
+import TkInformationDisplayer from './utils/display/terminalKit/TkInformationDisplayer';
 import InformationDisplayer from './utils/display/InformationDisplayer';
-
-const term = require('terminal-kit').terminal;
+import UserInteractionHandler from './utils/interaction/UserInteractionHandler';
+import AbstractMergeRequest from './model/common/AbstractMergeRequest';
 
 export default class EasyReleasePackager {
   /**            Properties           * */
@@ -14,12 +15,20 @@ export default class EasyReleasePackager {
 
   private logger : LoggerInterface;
 
+  private displayer : InformationDisplayer;
+
+  private userInteractionHandler : UserInteractionHandler;
+
   constructor(
-    repository : AbstractVcsRepository, configuration : Configuration, logger : LoggerInterface,
+    repository : AbstractVcsRepository, configuration : Configuration,
+    logger : LoggerInterface, displayer : InformationDisplayer,
+    userInteractionHandler : UserInteractionHandler,
   ) {
     this.repository = repository;
     this.configuration = configuration;
     this.logger = logger;
+    this.displayer = displayer;
+    this.userInteractionHandler = userInteractionHandler;
 
     this.logger.info('EasyReleasePackager application created !');
   }
@@ -27,11 +36,36 @@ export default class EasyReleasePackager {
   // eslint-disable-next-line class-methods-use-this
   async startPackage() : Promise<void> {
     this.logger.info('Fetch MR to deliver');
-    const mrToDeliver = await this.repository.getMrToDeliver(this.configuration.getLabelsDeliver());
-    this.logger.info(`${mrToDeliver.length} MR to deliver found`);
-    console.log('MR to deliver');
-    console.log(mrToDeliver);
-    InformationDisplayer.displayMrToDeliver(mrToDeliver);
+    let mrsToDeliver = await this.repository.getMrToDeliver(
+      this.configuration.getLabelsDeliver(),
+    );
+    this.logger.info(`${mrsToDeliver.length} MR to deliver found`);
+    this.canContinueDeliveryProcess(mrsToDeliver);
+
+    this.displayer.displayMrToDeliver(mrsToDeliver);
+
+    let userRequestRemoveMR = await this.userInteractionHandler.handleAskUserIfHeWantsToRemoveMr();
+    while (userRequestRemoveMR && mrsToDeliver.length !== 0) {
+      this.logger.debug('User answered yes to remove a MR from the process');
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const mrToRemove = await this.userInteractionHandler.handleAskUserMrToRemove(mrsToDeliver);
+        this.logger.info(`The MR #${mrToRemove.getNumber()} has been removed from the process`);
+        mrsToDeliver = mrsToDeliver.filter((mr) => mr.getNumber() !== mrToRemove.getNumber());
+        this.canContinueDeliveryProcess(mrsToDeliver);
+        this.displayer.displayMrToDeliver(mrsToDeliver);
+        // eslint-disable-next-line no-await-in-loop
+        userRequestRemoveMR = await this.userInteractionHandler.handleAskUserIfHeWantsToRemoveMr();
+      } catch (error) {
+        this.logger.warning('Cancel MR removing selection');
+        userRequestRemoveMR = false;
+      }
+    }
+
+    this.logger.info('Continuing delivery process with the remaining MRs');
+    this.displayer.displayMrToDeliver(mrsToDeliver);
+
+    console.log('CONTINUE');
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -55,6 +89,16 @@ export default class EasyReleasePackager {
     } else {
       this.logger.info('default action : release');
       this.startPackage();
+    }
+  }
+
+  /** Stop the delivery process if the running conditions are not met  * */
+  private canContinueDeliveryProcess(mrsToDeliver : AbstractMergeRequest[]) : void {
+    if (mrsToDeliver.length === 0) {
+      this.logger.info('No MR to deliver --> delivery process end here');
+      this.logger.info('GoodBye !');
+
+      process.exit();
     }
   }
 }

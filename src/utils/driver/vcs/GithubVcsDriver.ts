@@ -109,6 +109,7 @@ export default class GithubVcsDriver implements AbstractVcsDriver {
       githubPr.state,
       new Date(githubPr.created_at),
       githubPr.updated_at ? new Date(githubPr.updated_at) : null,
+      githubPr.number,
     );
   }
 
