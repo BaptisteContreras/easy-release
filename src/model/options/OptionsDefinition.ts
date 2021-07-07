@@ -44,7 +44,7 @@ const optionsCliDefinition = [
   {
     name: 'currentWorkDirectory',
     alias: 'w',
-    type: Boolean,
+    type: String,
     required: true,
     description: 'Change the current work directory',
   } as OptionDefinitionElement,

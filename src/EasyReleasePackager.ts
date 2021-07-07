@@ -1,10 +1,11 @@
 import AbstractVcsRepository from './utils/repository/AbstractVcsRepository';
 import Configuration from './model/configuration/Configuration';
 import LoggerInterface from './utils/logger/LoggerInterface';
-import TkInformationDisplayer from './utils/display/terminalKit/TkInformationDisplayer';
 import InformationDisplayer from './utils/display/InformationDisplayer';
 import UserInteractionHandler from './utils/interaction/UserInteractionHandler';
 import AbstractMergeRequest from './model/common/AbstractMergeRequest';
+import GitDriver from './utils/driver/git/GitDriver';
+import GitTools from './utils/tools/GitTools';
 
 export default class EasyReleasePackager {
   /**            Properties           * */
@@ -19,21 +20,23 @@ export default class EasyReleasePackager {
 
   private userInteractionHandler : UserInteractionHandler;
 
+  private gitDriver : GitDriver;
+
   constructor(
     repository : AbstractVcsRepository, configuration : Configuration,
     logger : LoggerInterface, displayer : InformationDisplayer,
-    userInteractionHandler : UserInteractionHandler,
+    userInteractionHandler : UserInteractionHandler, gitDriver : GitDriver,
   ) {
     this.repository = repository;
     this.configuration = configuration;
     this.logger = logger;
     this.displayer = displayer;
     this.userInteractionHandler = userInteractionHandler;
+    this.gitDriver = gitDriver;
 
     this.logger.info('EasyReleasePackager application created !');
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async startPackage() : Promise<void> {
     this.logger.info('Fetch MR to deliver');
     let mrsToDeliver = await this.repository.getMrToDeliver(
@@ -65,6 +68,22 @@ export default class EasyReleasePackager {
     this.logger.info('Continuing delivery process with the remaining MRs');
     this.displayer.displayMrToDeliver(mrsToDeliver);
 
+    const baseReleaseBranchName = GitTools.handleGitReleaseName(
+      this.configuration.getReleaseBranchName(), this.configuration.getProfile(),
+    );
+
+    this.logger.debug(`From release branch name format ${this.configuration.getReleaseBranchName()} generate ${baseReleaseBranchName}`);
+
+    const releaseBranchName = await this.userInteractionHandler
+      .handleAskUserToChangeReleaseBranchName(baseReleaseBranchName);
+
+    this.logger.info(`${releaseBranchName} is the current release branch name`);
+
+    await this.gitDriver.createAndCheckoutToReleaseBranch(
+      releaseBranchName, this.configuration.getBaseReleaseBranch(),
+    );
+
+    console.log(this.configuration.getCwd());
     console.log('CONTINUE');
   }
 

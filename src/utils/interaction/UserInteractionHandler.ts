@@ -6,4 +6,6 @@ export default interface UserInteractionHandler {
 
   /** This method let the use pick a MR to remove from the release process  * */
   handleAskUserMrToRemove(mrsToDeliver : AbstractMergeRequest[]): Promise<AbstractMergeRequest>
+
+  handleAskUserToChangeReleaseBranchName(releaseBranchName :string) : Promise<string>;
 }

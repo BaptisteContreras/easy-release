@@ -38,4 +38,24 @@ export default class TkUserInteractionHandler implements UserInteractionHandler 
       });
     });
   }
+
+  // eslint-disable-next-line class-methods-use-this
+  handleAskUserToChangeReleaseBranchName(releaseBranchName: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      term.cyan(`Current release branch name : ${releaseBranchName} . Do you want to change it [y|N] ?\n`);
+      term.yesOrNo({ yes: ['y'], no: ['n', 'ENTER'] }, (error : any, result : boolean) => {
+        if (result) {
+          term.cyan('Enter the new release branch name : \n');
+          term.inputField(
+            (inputError : any, input : any) => {
+              term.cyan('\n');
+              resolve(input);
+            },
+          );
+        } else {
+          resolve(releaseBranchName);
+        }
+      });
+    });
+  }
 }

@@ -21,8 +21,15 @@ export default class Configuration {
 
   private resume : boolean;
 
+  private releaseBranchName : string;
+
+  private baseReleaseBranch : string;
+
   /**            Constructor           * */
-  constructor(vcsConfiguration: AbstractVcsConfiguration, labelsDeliver : string[]) {
+  constructor(
+    vcsConfiguration: AbstractVcsConfiguration, labelsDeliver : string[],
+    releaseBranchName : string, baseReleaseBranch : string,
+  ) {
     this.vcsConfiguration = vcsConfiguration;
     this.verbose = false;
     this.currentWorkDirectory = '.';
@@ -31,6 +38,8 @@ export default class Configuration {
     this.profile = 'recette';
     this.release = false;
     this.resume = false;
+    this.releaseBranchName = releaseBranchName;
+    this.baseReleaseBranch = baseReleaseBranch;
   }
 
   /**            Methods           * */
@@ -39,14 +48,17 @@ export default class Configuration {
     vcsConfiguration: AbstractVcsConfiguration,
     parsedConfiguration: RawConfiguration,
   ) : Configuration {
-    return new Configuration(vcsConfiguration, parsedConfiguration.LABELS_DELIVER_NAME);
+    return new Configuration(
+      vcsConfiguration, parsedConfiguration.LABELS_DELIVER_NAME,
+      parsedConfiguration.RELEASE_BRANCH_NAME, parsedConfiguration.BASE_RELEASE_BRANCH,
+    );
   }
 
   /** Merge the CLI option with the parsed application's configuration * */
   public mergeCliOptions(cliOptions : CliOptions) : Configuration {
     this.verbose = cliOptions.verbose;
-    this.currentWorkDirectory = cliOptions.currentWorkDirectory;
-    this.configurationFilePath = cliOptions.configurationFilePath;
+    this.currentWorkDirectory = cliOptions.currentWorkDirectory || '.';
+    this.configurationFilePath = cliOptions.configurationFilePath || '.';
     this.profile = cliOptions.profile;
     this.resume = cliOptions.resume;
     this.release = cliOptions.release;
@@ -77,5 +89,17 @@ export default class Configuration {
 
   isResume() : boolean {
     return this.resume;
+  }
+
+  getReleaseBranchName() : string {
+    return this.releaseBranchName;
+  }
+
+  getBaseReleaseBranch() : string {
+    return this.baseReleaseBranch;
+  }
+
+  getCwd() : string {
+    return this.currentWorkDirectory;
   }
 }

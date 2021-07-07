@@ -4,6 +4,8 @@ import RepositoryFactory from './repository/RepositoryFactory';
 import LoggerInterface from '../utils/logger/LoggerInterface';
 import DisplayerFactory from './display/DisplayerFactory';
 import UserInteractionHandlerFactory from './interaction/UserInteractionHandlerFactory';
+import GitDriver from '../utils/driver/git/GitDriver';
+import GitDriverFactory from './driver/GitDriverFactory';
 
 export default class MainFactory {
   public static createApplication(
@@ -17,6 +19,7 @@ export default class MainFactory {
       logger,
       DisplayerFactory.createTerminalKitDisplayer(),
       UserInteractionHandlerFactory.createTkInteractionHandler(),
+      GitDriverFactory.createDriver(logger, configuration),
     );
   }
 }

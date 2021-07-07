@@ -27,6 +27,16 @@ const schemaDeclaration = {
     required: true,
     type: 'array',
   } as ConfigurationSchema,
+  RELEASE_BRANCH_NAME: {
+    name: 'RELEASE_BRANCH_NAME',
+    required: false,
+    type: 'string',
+  } as ConfigurationSchema,
+  BASE_RELEASE_BRANCH: {
+    name: 'BASE_RELEASE_BRANCH',
+    required: true,
+    type: 'string',
+  } as ConfigurationSchema,
 };
 
 export interface ConfigurationSchema {
@@ -42,6 +52,8 @@ export interface RawConfiguration {
   ORGANISATION_NAME : string,
   REPOSITORY_NAME : string,
   LABELS_DELIVER_NAME : string[],
+  RELEASE_BRANCH_NAME : string,
+  BASE_RELEASE_BRANCH : string,
 }
 
 export default schemaDeclaration;
