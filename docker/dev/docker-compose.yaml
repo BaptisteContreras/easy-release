@@ -1,0 +1,17 @@
+version: "3.4"
+services:
+  easyrelease:
+    tty: true
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - "../../build:/easyrelease/build/"
+      - "../../node_modules:/easyrelease/node_modules/"
+      - "../../config:/easyrelease/config/"
+      - "../../package.json:/easyrelease/package.json"
+      - "../../package.lock:/easyrelease/package.lock"
+    env_file:
+      - "./.env"
+      - "./.env.dev"
+    command: ["easyrelease", "-h"]
