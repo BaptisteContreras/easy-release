@@ -2,3 +2,5 @@ node_modules/
 build/
 .idea/
 .env.*
+!.env.example
+docker/dev/.env

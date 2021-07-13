@@ -2,6 +2,7 @@ version: "3.4"
 services:
   easyrelease:
     tty: true
+    stdin_open: true
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,7 +12,8 @@ services:
       - "../../config:/easyrelease/config/"
       - "../../package.json:/easyrelease/package.json"
       - "../../package.lock:/easyrelease/package.lock"
+      - "${CONFIG_PATH}:${CONFIG_DIR_DEST}"
     env_file:
       - "./.env"
-      - "./.env.dev"
-    command: ["easyrelease", "-h"]
+    #command: ["easyrelease", "--verbose", "--configurationFilePath=${CONFIG_DIR_DEST}", "--profile=${PROFILE}", "--currentWorkDirectory=${REPO_DIR_NAME}"]
+    command: bash
