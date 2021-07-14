@@ -1,4 +1,5 @@
-import Vcs from '../constant/Vcs';
+import Vcs from '../enum/Vcs';
+import MergeStrategy from '../enum/MergeStrategy';
 
 const schemaDeclaration = {
   VCS_TYPE: {
@@ -37,6 +38,12 @@ const schemaDeclaration = {
     required: true,
     type: 'string',
   } as ConfigurationSchema,
+  MERGE_STRATEGY: {
+    name: 'MERGE_STRATEGY',
+    required: true,
+    type: 'string',
+    choices: [MergeStrategy.CHERRY_PICK, MergeStrategy.BRANCH_MERGE],
+  } as ConfigurationSchema,
 };
 
 export interface ConfigurationSchema {
@@ -54,6 +61,7 @@ export interface RawConfiguration {
   LABELS_DELIVER_NAME : string[],
   RELEASE_BRANCH_NAME : string,
   BASE_RELEASE_BRANCH : string,
+  MERGE_STRATEGY : string,
 }
 
 export default schemaDeclaration;

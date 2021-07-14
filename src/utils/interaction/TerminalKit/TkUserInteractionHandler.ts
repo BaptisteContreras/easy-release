@@ -1,5 +1,6 @@
 import UserInteractionHandler from '../UserInteractionHandler';
 import AbstractMergeRequest from '../../../model/common/AbstractMergeRequest';
+import MergeStrategy from '../../../model/enum/MergeStrategy';
 
 const term = require('terminal-kit').terminal;
 
@@ -54,6 +55,29 @@ export default class TkUserInteractionHandler implements UserInteractionHandler 
           );
         } else {
           resolve(releaseBranchName);
+        }
+      });
+    });
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  handleAskUserToChangeMergeStrategy(currentMergeStrategy: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      term.cyan(`Current merge strategy : ${currentMergeStrategy} . Do you want to change it [y|N] ?\n`);
+      term.yesOrNo({ yes: ['y'], no: ['n', 'ENTER'] }, (error : any, result : boolean) => {
+        if (result) {
+          term.cyan('Select the merge strategy to apply : \n');
+          term.gridMenu([MergeStrategy.CHERRY_PICK, MergeStrategy.BRANCH_MERGE], {
+            exitOnUnexpectedKey: true,
+          }, (error2 : any, response :any) => {
+            if (response.unexpectedKey) {
+              resolve(currentMergeStrategy);
+            } else {
+              resolve(response.selectedText);
+            }
+          });
+        } else {
+          resolve(currentMergeStrategy);
         }
       });
     });

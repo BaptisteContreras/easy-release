@@ -6,6 +6,8 @@ import UserInteractionHandler from './utils/interaction/UserInteractionHandler';
 import AbstractMergeRequest from './model/common/AbstractMergeRequest';
 import GitDriver from './utils/driver/git/GitDriver';
 import GitTools from './utils/tools/GitTools';
+import GitMergeHandler from './utils/merge/GitMergeHandler';
+import MergeStrategy from './model/enum/MergeStrategy';
 
 export default class EasyReleasePackager {
   /**            Properties           * */
@@ -22,10 +24,13 @@ export default class EasyReleasePackager {
 
   private gitDriver : GitDriver;
 
+  private gitMergeHandler : GitMergeHandler;
+
   constructor(
     repository : AbstractVcsRepository, configuration : Configuration,
     logger : LoggerInterface, displayer : InformationDisplayer,
     userInteractionHandler : UserInteractionHandler, gitDriver : GitDriver,
+    gitMergeHandler : GitMergeHandler,
   ) {
     this.repository = repository;
     this.configuration = configuration;
@@ -33,6 +38,7 @@ export default class EasyReleasePackager {
     this.displayer = displayer;
     this.userInteractionHandler = userInteractionHandler;
     this.gitDriver = gitDriver;
+    this.gitMergeHandler = gitMergeHandler;
 
     this.logger.info('EasyReleasePackager application created !');
   }
@@ -79,11 +85,19 @@ export default class EasyReleasePackager {
 
     this.logger.info(`${releaseBranchName} is the current release branch name`);
 
-    await this.gitDriver.createAndCheckoutToReleaseBranch(
-      releaseBranchName, this.configuration.getBaseReleaseBranch(),
+    await this.gitDriver.checkoutAndPullBaseBranch(
+      this.configuration.getBaseReleaseBranch(),
     );
 
-    console.log(this.configuration.getCwd());
+    await this.gitDriver.createAndCheckoutReleaseBranch(
+      releaseBranchName,
+    );
+
+    const mergeStrategy = await this.userInteractionHandler
+      .handleAskUserToChangeMergeStrategy(this.configuration.getMergeStrategy());
+
+    this.gitMergeHandler.handleMerge([], mergeStrategy);
+    console.log(mergeStrategy);
     console.log('CONTINUE');
   }
 

@@ -6,6 +6,7 @@ import DisplayerFactory from './display/DisplayerFactory';
 import UserInteractionHandlerFactory from './interaction/UserInteractionHandlerFactory';
 import GitDriver from '../utils/driver/git/GitDriver';
 import GitDriverFactory from './driver/GitDriverFactory';
+import MergeHandlerFactory from './merge/MergeHandlerFactory';
 
 export default class MainFactory {
   public static createApplication(
@@ -13,13 +14,15 @@ export default class MainFactory {
   ) : EasyReleasePackager {
     // TODO select repository depending on configuration
 
+    const gitDriver = GitDriverFactory.createDriver(logger, configuration);
     return new EasyReleasePackager(
       (new RepositoryFactory(configuration.getVcsConfiguration(), logger)).createGithubRepository(),
       configuration,
       logger,
       DisplayerFactory.createTerminalKitDisplayer(),
       UserInteractionHandlerFactory.createTkInteractionHandler(),
-      GitDriverFactory.createDriver(logger, configuration),
+      gitDriver,
+      (new MergeHandlerFactory(logger, gitDriver)).createMergeHandler(),
     );
   }
 }

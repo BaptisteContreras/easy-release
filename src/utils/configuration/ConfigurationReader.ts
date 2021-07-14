@@ -2,7 +2,7 @@ import Configuration from '../../model/configuration/Configuration';
 import ConfigurationDriver from '../driver/configuration/ConfigurationDriver';
 import JsonConfigurationDriver from '../driver/configuration/JsonConfigurationDriver';
 import AbstractVcsConfiguration from '../../model/configuration/AbstractVcsConfiguration';
-import Vcs from '../../model/constant/Vcs';
+import Vcs from '../../model/enum/Vcs';
 import GithubConfiguration from '../../model/configuration/GithubConfiguration';
 import ConfigurationValidator from './ConfigurationValidator';
 import schemaDeclaration, { RawConfiguration } from '../../model/configuration/ConfigurationSchema';

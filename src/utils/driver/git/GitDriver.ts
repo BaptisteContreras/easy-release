@@ -19,22 +19,42 @@ export default class GitDriver {
     this.logger.info('GitDriver created');
   }
 
-  /** Create the new release branch in the current git repository * */
-  createAndCheckoutToReleaseBranch(
-    releaseBranchName : string, baseBranch : string,
-  ) : Promise<void> {
+  /** Update local base branch before using it * */
+  checkoutAndPullBaseBranch(baseBranch : string) : Promise<void> {
     return new Promise((resolve, reject) => {
-      this.logger.info('create and checkout to release branch');
+      this.logger.info(`checkout and pull base branch : ${baseBranch}`);
       this.logger.debug(`GIT : execute "cd ${this.configuration.getCwd()} && git checkout ${baseBranch} && git pull origin ${baseBranch}"`);
-      const process = spawn(`git checkout ${baseBranch} && git pull origin ${baseBranch}`, {
+      const process = exec(`git checkout ${baseBranch} && git pull origin ${baseBranch}`, {
         cwd: this.configuration.getCwd(),
       });
 
       process.on('close', (retCode : number) => {
-        console.log(`retCode ${retCode}`);
         if (retCode === 0) {
           resolve();
         } else {
+          this.logger.error(`checkoutAndPullBaseBranch : Failed with code ${retCode}`);
+          reject();
+        }
+      });
+    });
+  }
+
+  /** Create the new release branch in the current git repository * */
+  createAndCheckoutReleaseBranch(
+    releaseBranchName : string,
+  ) : Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.logger.info('create and checkout to release branch');
+      this.logger.debug(`GIT : execute "cd ${this.configuration.getCwd()} && git checkout -b ${releaseBranchName}`);
+      const process = exec(`git checkout -b ${releaseBranchName}`, {
+        cwd: this.configuration.getCwd(),
+      });
+
+      process.on('close', (retCode : number) => {
+        if (retCode === 0) {
+          resolve();
+        } else {
+          this.logger.error(`createAndCheckoutReleaseBranch : Failed with code ${retCode}`);
           reject();
         }
       });

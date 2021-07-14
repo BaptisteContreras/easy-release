@@ -25,10 +25,12 @@ export default class Configuration {
 
   private baseReleaseBranch : string;
 
+  private mergeStrategy : string;
+
   /**            Constructor           * */
   constructor(
     vcsConfiguration: AbstractVcsConfiguration, labelsDeliver : string[],
-    releaseBranchName : string, baseReleaseBranch : string,
+    releaseBranchName : string, baseReleaseBranch : string, mergeStrategy : string,
   ) {
     this.vcsConfiguration = vcsConfiguration;
     this.verbose = false;
@@ -40,6 +42,7 @@ export default class Configuration {
     this.resume = false;
     this.releaseBranchName = releaseBranchName;
     this.baseReleaseBranch = baseReleaseBranch;
+    this.mergeStrategy = mergeStrategy;
   }
 
   /**            Methods           * */
@@ -51,6 +54,7 @@ export default class Configuration {
     return new Configuration(
       vcsConfiguration, parsedConfiguration.LABELS_DELIVER_NAME,
       parsedConfiguration.RELEASE_BRANCH_NAME, parsedConfiguration.BASE_RELEASE_BRANCH,
+      parsedConfiguration.MERGE_STRATEGY,
     );
   }
 
@@ -101,5 +105,9 @@ export default class Configuration {
 
   getCwd() : string {
     return this.currentWorkDirectory;
+  }
+
+  getMergeStrategy() : string {
+    return this.mergeStrategy;
   }
 }
