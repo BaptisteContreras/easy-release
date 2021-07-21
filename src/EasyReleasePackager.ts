@@ -97,6 +97,8 @@ export default class EasyReleasePackager {
       .handleAskUserToChangeMergeStrategy(this.configuration.getMergeStrategy());
 
     this.gitMergeHandler.handleMerge([], mergeStrategy);
+
+    this.repository.getCommitsToCherryPick(mrsToDeliver);
     console.log(mergeStrategy);
     console.log('CONTINUE');
   }

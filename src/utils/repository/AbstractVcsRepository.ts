@@ -32,4 +32,8 @@ export default abstract class AbstractVcsRepository {
 
     return mrList.filter((mr) => mr.getLinkedIssue()?.hasAtLeastOneLabel(deliverLabels));
   }
+
+  async getCommitsToCherryPick(mrsToDeliver : AbstractMergeRequest[]) : Promise<void> {
+    this.vcsDriver.getCommitsForMr(mrsToDeliver[0]);
+  }
 }

@@ -36,6 +36,12 @@ export default class GithubVcsDriver implements AbstractVcsDriver {
   }
 
   /**            Methods           * */
+  // eslint-disable-next-line class-methods-use-this
+  async getCommitsForMr(mr: AbstractMergeRequest): Promise<void> {
+    const a = await this.getRepo().getPullRequest(mr.getNumber());
+
+    console.log(a.data);
+  }
 
   // eslint-disable-next-line class-methods-use-this
   async getLinkedIssue(linkedMr: AbstractMergeRequest): Promise<AbstractIssue | null> {
