@@ -2,6 +2,7 @@ import GithubVcsDriver from '../../utils/driver/vcs/GithubVcsDriver';
 import AbstractVcsConfiguration from '../../model/configuration/AbstractVcsConfiguration';
 import GithubApiLibFactory from '../lib/GithubApiLibFactory';
 import LoggerInterface from '../../utils/logger/LoggerInterface';
+import OctokitLibFactory from '../lib/OctokitLibFactory';
 
 export default class VcsDriverFactory {
   /**            Properties           * */
@@ -21,7 +22,7 @@ export default class VcsDriverFactory {
 
   createVcsGithubDriver() : GithubVcsDriver {
     return new GithubVcsDriver(
-      GithubApiLibFactory.createGithubApiLib(this.vcsConfiguration.getApiToken()),
+      OctokitLibFactory.createOctokitClient(this.vcsConfiguration.getApiToken()),
       this.vcsConfiguration.getRepositoryName(),
       this.vcsConfiguration.getOrganisationName(),
       this.logger,
