@@ -1,4 +1,5 @@
-import AbstractVcsDriver from './AbstractVcsDriver';
+import { Octokit } from '@octokit/rest';
+import AbstractVcsPlatformDriver from './AbstractVcsPlatformDriver';
 import AbstractIssue from '../../../model/common/AbstractIssue';
 import AbstractMergeRequest from '../../../model/common/AbstractMergeRequest';
 import LoggerInterface from '../../logger/LoggerInterface';
@@ -7,9 +8,9 @@ import GithubUser from '../../../model/github/GithubUser';
 import GithubIssue from '../../../model/github/GithubIssue';
 import GithubLabel from '../../../model/github/GithubLabel';
 
-export default class GithubVcsDriver implements AbstractVcsDriver {
+export default class GithubOctokitDriver implements AbstractVcsPlatformDriver {
   /**            Properties           * */
-  private githubLib : any;
+  private octokitClient : Octokit;
 
   private repositoryName : string;
 
@@ -24,13 +25,14 @@ export default class GithubVcsDriver implements AbstractVcsDriver {
   /**            Constructor           * */
 
   constructor(
-    githubLib: any, repositoryName: string, organisationName: string, logger : LoggerInterface,
+    octokitClient: Octokit, repositoryName: string,
+    organisationName: string, logger : LoggerInterface,
   ) {
-    this.githubLib = githubLib;
+    this.octokitClient = octokitClient;
     this.repositoryName = repositoryName;
     this.organisationName = organisationName;
     this.logger = logger;
-    logger.info('GithubVcsDriver created');
+    logger.info('GithubOctokitDriver created');
     this.repo = null;
     this.issues = null;
   }
@@ -53,7 +55,11 @@ export default class GithubVcsDriver implements AbstractVcsDriver {
     }
 
     try {
-      const rawIssue = (await this.getIssues().getIssue(linkedIssueId)).data;
+      const rawIssue = (await this.octokitClient.rest.issues.get({
+        owner: this.organisationName,
+        repo: this.repositoryName,
+        issue_number: parseInt(linkedIssueId, 10),
+      })).data;
       if (!rawIssue) {
         this.logger.warning(`PR ${linkedMr.getTitle()} linked to issue #${linkedIssueId} : Issue not found with Github API. Are you sure this issue ID is correct ?`);
 
@@ -62,7 +68,7 @@ export default class GithubVcsDriver implements AbstractVcsDriver {
 
       this.logger.debug(`PR ${linkedMr.getTitle()} linked to issue #${linkedIssueId} : Issue found !`);
 
-      return GithubVcsDriver.buildIssue(rawIssue);
+      return GithubOctokitDriver.buildIssue(rawIssue);
     } catch (error) {
       this.logger.warning(`PR ${linkedMr.getTitle()} linked to issue #${linkedIssueId} : Issue not found with Github API. Are you sure this issue ID is correct ?`);
 
@@ -72,7 +78,9 @@ export default class GithubVcsDriver implements AbstractVcsDriver {
 
   // eslint-disable-next-line class-methods-use-this
   async getOpenMrs(): Promise<AbstractMergeRequest[]> {
-    const prs = await this.getRepo().listPullRequests({
+    const prs = await this.octokitClient.rest.pulls.list({
+      owner: this.organisationName,
+      repo: this.repositoryName,
       state: 'open',
     });
     const prList : AbstractMergeRequest[] = [];
@@ -89,7 +97,7 @@ export default class GithubVcsDriver implements AbstractVcsDriver {
   /** Return the github-api repo from cache, otherwise, init and cache it !  * */
   private getRepo(): any {
     if (!this.repo) {
-      this.repo = this.githubLib.getRepo(this.organisationName, this.repositoryName);
+      //   this.repo = this.githubLib.getRepo(this.organisationName, this.repositoryName);
     }
 
     return this.repo;
@@ -98,18 +106,18 @@ export default class GithubVcsDriver implements AbstractVcsDriver {
   /** Return the github-api issues from cache, otherwise, init and cache it !  * */
   private getIssues(): any {
     if (!this.issues) {
-      this.issues = this.githubLib.getIssues(this.organisationName, this.repositoryName);
+      //     this.issues = this.githubLib.getIssues(this.organisationName, this.repositoryName);
     }
 
     return this.issues;
   }
 
-  /** Build a PullRequest from a github-api PR object * */
+  /** Build a PullRequest from an Octokit PR object * */
   private buildMr(githubPr : any) : AbstractMergeRequest {
     return new PullRequest(
       githubPr.title,
       githubPr.url,
-      GithubVcsDriver.buildOwner(githubPr.user),
+      GithubOctokitDriver.buildOwner(githubPr.user),
       githubPr.body,
       this.extractIssueIdFromPrBody(githubPr.body),
       githubPr.state,
@@ -119,7 +127,7 @@ export default class GithubVcsDriver implements AbstractVcsDriver {
     );
   }
 
-  /** Build a GithubIssue from a github-api issue object * */
+  /** Build a GithubIssue from an Octokit issue object * */
   private static buildIssue(githubIssue : any) : GithubIssue {
     return new GithubIssue(
       githubIssue.title,
@@ -131,7 +139,7 @@ export default class GithubVcsDriver implements AbstractVcsDriver {
     );
   }
 
-  /** Build a GithubLabel from a github-api label object * */
+  /** Build a GithubLabel from an Octokit label object * */
   private static buildLabel(githubLabel : any) : GithubLabel {
     return new GithubLabel(
       githubLabel.name,
@@ -141,7 +149,7 @@ export default class GithubVcsDriver implements AbstractVcsDriver {
     );
   }
 
-  /** Build a GithubUser from a github-api user object * */
+  /** Build a GithubUser from an Octokit user object * */
   private static buildOwner(rawGithubOwner : any) : GithubUser {
     return new GithubUser(
       rawGithubOwner.login,

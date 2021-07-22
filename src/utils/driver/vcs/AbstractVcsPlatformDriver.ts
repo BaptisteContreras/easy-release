@@ -1,7 +1,7 @@
 import AbstractIssue from '../../../model/common/AbstractIssue';
 import AbstractMergeRequest from '../../../model/common/AbstractMergeRequest';
 
-export default interface AbstractVcsDriver {
+export default interface AbstractVcsPlatformDriver {
 
   /** Returns the list of all issues linked to an open MR in the given list * */
   // getIssuesLinkedTo(linkedMrs: AbstractMergeRequest[]) : AbstractIssue[];
@@ -14,5 +14,4 @@ export default interface AbstractVcsDriver {
 
   /** Returns the list of all commits for this MR * */
   getCommitsForMr(mr : AbstractMergeRequest) : Promise<void>;
-
 }

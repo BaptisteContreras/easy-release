@@ -1,10 +1,9 @@
-import GithubVcsDriver from '../../utils/driver/vcs/GithubVcsDriver';
 import AbstractVcsConfiguration from '../../model/configuration/AbstractVcsConfiguration';
-import GithubApiLibFactory from '../lib/GithubApiLibFactory';
 import LoggerInterface from '../../utils/logger/LoggerInterface';
 import OctokitLibFactory from '../lib/OctokitLibFactory';
+import GithubOctokitDriver from '../../utils/driver/vcs/GithubOctokitDriver';
 
-export default class VcsDriverFactory {
+export default class VcsPlatformDriverFactory {
   /**            Properties           * */
 
   private vcsConfiguration : AbstractVcsConfiguration;
@@ -20,8 +19,8 @@ export default class VcsDriverFactory {
 
   /**            Methods           * */
 
-  createVcsGithubDriver() : GithubVcsDriver {
-    return new GithubVcsDriver(
+  createVcsGithubDriver() : GithubOctokitDriver {
+    return new GithubOctokitDriver(
       OctokitLibFactory.createOctokitClient(this.vcsConfiguration.getApiToken()),
       this.vcsConfiguration.getRepositoryName(),
       this.vcsConfiguration.getOrganisationName(),

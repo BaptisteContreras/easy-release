@@ -1,14 +1,14 @@
 import AbstractVcsConfiguration from '../../model/configuration/AbstractVcsConfiguration';
 import GithubRepository from '../../utils/repository/GithubRepository';
-import VcsDriverFactory from '../driver/VcsDriverFactory';
 import LoggerInterface from '../../utils/logger/LoggerInterface';
+import VcsPlatformDriverFactory from '../driver/VcsPlatformDriverFactory';
 
 export default class RepositoryFactory {
   /**            Properties           * */
 
   private vcsConfiguration : AbstractVcsConfiguration;
 
-  private vcsDriverFactory : VcsDriverFactory;
+  private vcsDriverFactory : VcsPlatformDriverFactory;
 
   private readonly logger : LoggerInterface;
 
@@ -16,7 +16,7 @@ export default class RepositoryFactory {
 
   constructor(vcsConfiguration: AbstractVcsConfiguration, logger : LoggerInterface) {
     this.vcsConfiguration = vcsConfiguration;
-    this.vcsDriverFactory = new VcsDriverFactory(vcsConfiguration, logger);
+    this.vcsDriverFactory = new VcsPlatformDriverFactory(vcsConfiguration, logger);
     this.logger = logger;
   }
 

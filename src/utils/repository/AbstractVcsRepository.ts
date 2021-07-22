@@ -1,4 +1,4 @@
-import AbstractVcsDriver from '../driver/vcs/AbstractVcsDriver';
+import AbstractVcsPlatformDriver from '../driver/vcs/AbstractVcsPlatformDriver';
 import VcsEnum from '../../model/enum/VcsEnum';
 import LoggerInterface from '../logger/LoggerInterface';
 import AbstractMergeRequest from '../../model/common/AbstractMergeRequest';
@@ -8,12 +8,14 @@ export default abstract class AbstractVcsRepository {
 
   protected vcsType : VcsEnum;
 
-  protected vcsDriver : AbstractVcsDriver;
+  protected vcsDriver : AbstractVcsPlatformDriver;
 
   protected logger : LoggerInterface;
 
   /**            Constructor           * */
-  protected constructor(vcsType: VcsEnum, vcsDriver: AbstractVcsDriver, logger : LoggerInterface) {
+  protected constructor(
+    vcsType: VcsEnum, vcsDriver: AbstractVcsPlatformDriver, logger : LoggerInterface,
+  ) {
     this.vcsType = vcsType;
     this.vcsDriver = vcsDriver;
     this.logger = logger;
