@@ -1,5 +1,6 @@
 import AbstractUser from './AbstractUser';
 import AbstractIssue from './AbstractIssue';
+import AbstractCommit from './AbstractCommit';
 
 export default abstract class AbstractMergeRequest {
   /**            Properties           * */
@@ -23,6 +24,8 @@ export default abstract class AbstractMergeRequest {
 
   protected number : number;
 
+  protected commits : AbstractCommit[];
+
   /**            Constructor           * */
 
   protected constructor(
@@ -40,6 +43,7 @@ export default abstract class AbstractMergeRequest {
     this.updatedAt = updatedAt;
     this.linkedIssue = null;
     this.number = number;
+    this.commits = [];
   }
 
   /**            Accessors           * */
@@ -86,6 +90,14 @@ export default abstract class AbstractMergeRequest {
 
   getNumber() : number {
     return this.number;
+  }
+
+  getCommits() : AbstractCommit[] {
+    return this.commits;
+  }
+
+  addCommit(commit : AbstractCommit) : void {
+    this.commits.push(commit);
   }
 
   public abstract isOpen() : boolean;

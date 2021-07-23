@@ -7,6 +7,9 @@ import PullRequest from '../../../model/github/PullRequest';
 import GithubUser from '../../../model/github/GithubUser';
 import GithubIssue from '../../../model/github/GithubIssue';
 import GithubLabel from '../../../model/github/GithubLabel';
+import OctokitBuilder from '../../builder/platform/github/OctokitBuilder';
+import GithubCommit from '../../../model/github/GithubCommit';
+import AbstractCommit from '../../../model/common/AbstractCommit';
 
 export default class GithubOctokitDriver implements AbstractVcsPlatformDriver {
   /**            Properties           * */
@@ -17,10 +20,6 @@ export default class GithubOctokitDriver implements AbstractVcsPlatformDriver {
   private organisationName : string;
 
   private logger : LoggerInterface;
-
-  private repo : any;
-
-  private issues : any;
 
   /**            Constructor           * */
 
@@ -33,16 +32,24 @@ export default class GithubOctokitDriver implements AbstractVcsPlatformDriver {
     this.organisationName = organisationName;
     this.logger = logger;
     logger.info('GithubOctokitDriver created');
-    this.repo = null;
-    this.issues = null;
   }
 
   /**            Methods           * */
-  // eslint-disable-next-line class-methods-use-this
-  async getCommitsForMr(mr: AbstractMergeRequest): Promise<void> {
-    const a = await this.getRepo().getPullRequest(mr.getNumber());
 
-    console.log(a.data);
+  async getCommitsForMr(mr: AbstractMergeRequest): Promise<AbstractCommit[]> {
+    const rawCommits = (await this.octokitClient.rest.pulls.listCommits({
+      owner: this.organisationName,
+      repo: this.repositoryName,
+      pull_number: mr.getNumber(),
+    })).data;
+
+    const commits : GithubCommit[] = [];
+
+    rawCommits.forEach((el : any) => {
+      commits.push(OctokitBuilder.buildCommit(el));
+    });
+
+    return commits;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -68,7 +75,7 @@ export default class GithubOctokitDriver implements AbstractVcsPlatformDriver {
 
       this.logger.debug(`PR ${linkedMr.getTitle()} linked to issue #${linkedIssueId} : Issue found !`);
 
-      return GithubOctokitDriver.buildIssue(rawIssue);
+      return OctokitBuilder.buildIssue(rawIssue);
     } catch (error) {
       this.logger.warning(`PR ${linkedMr.getTitle()} linked to issue #${linkedIssueId} : Issue not found with Github API. Are you sure this issue ID is correct ?`);
 
@@ -87,75 +94,11 @@ export default class GithubOctokitDriver implements AbstractVcsPlatformDriver {
 
     prs.data.forEach((el : any) => {
       prList.push(
-        this.buildMr(el),
+        OctokitBuilder.buildMr(el, this.extractIssueIdFromPrBody(el.body)),
       );
     });
 
     return prList;
-  }
-
-  /** Return the github-api repo from cache, otherwise, init and cache it !  * */
-  private getRepo(): any {
-    if (!this.repo) {
-      //   this.repo = this.githubLib.getRepo(this.organisationName, this.repositoryName);
-    }
-
-    return this.repo;
-  }
-
-  /** Return the github-api issues from cache, otherwise, init and cache it !  * */
-  private getIssues(): any {
-    if (!this.issues) {
-      //     this.issues = this.githubLib.getIssues(this.organisationName, this.repositoryName);
-    }
-
-    return this.issues;
-  }
-
-  /** Build a PullRequest from an Octokit PR object * */
-  private buildMr(githubPr : any) : AbstractMergeRequest {
-    return new PullRequest(
-      githubPr.title,
-      githubPr.url,
-      GithubOctokitDriver.buildOwner(githubPr.user),
-      githubPr.body,
-      this.extractIssueIdFromPrBody(githubPr.body),
-      githubPr.state,
-      new Date(githubPr.created_at),
-      githubPr.updated_at ? new Date(githubPr.updated_at) : null,
-      githubPr.number,
-    );
-  }
-
-  /** Build a GithubIssue from an Octokit issue object * */
-  private static buildIssue(githubIssue : any) : GithubIssue {
-    return new GithubIssue(
-      githubIssue.title,
-      githubIssue.url,
-      githubIssue.labels.map((githubLabel : any) => this.buildLabel(githubLabel)),
-      this.buildOwner(githubIssue.user),
-      githubIssue.id,
-      githubIssue.number,
-    );
-  }
-
-  /** Build a GithubLabel from an Octokit label object * */
-  private static buildLabel(githubLabel : any) : GithubLabel {
-    return new GithubLabel(
-      githubLabel.name,
-      githubLabel.url,
-      githubLabel.id,
-      githubLabel.description,
-    );
-  }
-
-  /** Build a GithubUser from an Octokit user object * */
-  private static buildOwner(rawGithubOwner : any) : GithubUser {
-    return new GithubUser(
-      rawGithubOwner.login,
-      rawGithubOwner.html_url,
-      rawGithubOwner.id,
-    );
   }
 
   /** Return the linked issue's id contained in the body of the PR
@@ -170,7 +113,7 @@ export default class GithubOctokitDriver implements AbstractVcsPlatformDriver {
     this.logger.debug(`body match : ${bodyMatchs.length}`);
     if (bodyMatchs.length > 1) {
       this.logger.warning(`${'Several linked issue ID found in a Github'
-          + 'PR body : The first one will be chosen. PR body dump : ['}${githubPrBody}]`);
+      + 'PR body : The first one will be chosen. PR body dump : ['}${githubPrBody}]`);
     }
 
     const realId = bodyMatchs[0].match('[1-9]+');

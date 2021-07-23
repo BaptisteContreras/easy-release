@@ -98,8 +98,9 @@ export default class EasyReleasePackager {
 
     this.gitMergeHandler.handleMerge([], mergeStrategy);
 
-    this.repository.getCommitsToCherryPick(mrsToDeliver);
+    const commitsToCherryPick = await this.repository.getCommitsToCherryPick(mrsToDeliver);
     console.log(mergeStrategy);
+    console.log(commitsToCherryPick);
     console.log('CONTINUE');
   }
 

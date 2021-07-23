@@ -2,6 +2,7 @@ import AbstractVcsPlatformDriver from '../driver/vcs/AbstractVcsPlatformDriver';
 import VcsEnum from '../../model/enum/VcsEnum';
 import LoggerInterface from '../logger/LoggerInterface';
 import AbstractMergeRequest from '../../model/common/AbstractMergeRequest';
+import AbstractCommit from '../../model/common/AbstractCommit';
 
 export default abstract class AbstractVcsRepository {
   /**            Properties           * */
@@ -35,7 +36,21 @@ export default abstract class AbstractVcsRepository {
     return mrList.filter((mr) => mr.getLinkedIssue()?.hasAtLeastOneLabel(deliverLabels));
   }
 
-  async getCommitsToCherryPick(mrsToDeliver : AbstractMergeRequest[]) : Promise<void> {
-    this.vcsDriver.getCommitsForMr(mrsToDeliver[0]);
+  async getCommitsToCherryPick(mrsToDeliver : AbstractMergeRequest[]) : Promise<AbstractCommit[]> {
+    return (await Promise.all(mrsToDeliver.map(async (mr : AbstractMergeRequest) => {
+      const mrCommits = await this.vcsDriver.getCommitsForMr(mr);
+      this.logger.info(`${mrCommits.length} commit${mrCommits.length > 1 ? 's' : ''} found for MR ${mr.getNumber()}`);
+
+      if (mrCommits.length === 0) {
+        this.logger.warning(`No commit found for MR ${mr.getNumber()}`);
+      }
+
+      mrCommits.forEach((commit : AbstractCommit) => {
+        this.logger.debug(`Link commit SHA : ${commit.getSha()} with message ${commit.getMessage()} to MR ${mr.getNumber()}`);
+        mr.addCommit(commit);
+      });
+
+      return mrCommits;
+    }))).flat();
   }
 }
