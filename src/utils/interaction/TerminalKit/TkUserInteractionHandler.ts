@@ -1,6 +1,7 @@
 import UserInteractionHandler from '../UserInteractionHandler';
 import AbstractMergeRequest from '../../../model/common/AbstractMergeRequest';
 import MergeStrategy from '../../../model/enum/MergeStrategy';
+import AbstractCommit from '../../../model/common/AbstractCommit';
 
 const term = require('terminal-kit').terminal;
 
@@ -78,6 +79,41 @@ export default class TkUserInteractionHandler implements UserInteractionHandler 
           });
         } else {
           resolve(currentMergeStrategy);
+        }
+      });
+    });
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  handleAskUserIfHeWantsToUnselectCommits(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      term('Do you want to unselect a commit ? [y|N]\n');
+      term.yesOrNo({ yes: ['y'], no: ['n', 'ENTER'] }, (error : any, result : boolean) => {
+        if (result) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      });
+    });
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  handleAskUserCommitToUnselect(commitsToMerge: AbstractCommit[]): Promise<AbstractCommit> {
+    return new Promise((resolve, reject) => {
+      term.cyan('Choose a commit to unselect :\n');
+
+      const items = commitsToMerge.map(
+        (commit) => `${commit.getMessage()} by ${commit.getAuthor().getName()}`,
+      );
+
+      term.gridMenu(items, {
+        exitOnUnexpectedKey: true,
+      }, (error : any, response :any) => {
+        if (response.unexpectedKey) {
+          reject();
+        } else {
+          resolve(commitsToMerge[response.selectedIndex]);
         }
       });
     });

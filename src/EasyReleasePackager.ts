@@ -8,6 +8,8 @@ import GitDriver from './utils/driver/git/GitDriver';
 import GitTools from './utils/tools/GitTools';
 import GitMergeHandler from './utils/merge/GitMergeHandler';
 import MergeStrategy from './model/enum/MergeStrategy';
+import MergeableElement from './utils/merge/MergeableElement';
+import AbstractCommit from './model/common/AbstractCommit';
 
 export default class EasyReleasePackager {
   /**            Properties           * */
@@ -53,26 +55,7 @@ export default class EasyReleasePackager {
 
     this.displayer.displayMrToDeliver(mrsToDeliver);
 
-    let userRequestRemoveMR = await this.userInteractionHandler.handleAskUserIfHeWantsToRemoveMr();
-    while (userRequestRemoveMR && mrsToDeliver.length !== 0) {
-      this.logger.debug('User answered yes to remove a MR from the process');
-      try {
-        // eslint-disable-next-line no-await-in-loop
-        const mrToRemove = await this.userInteractionHandler.handleAskUserMrToRemove(mrsToDeliver);
-        this.logger.info(`The MR #${mrToRemove.getNumber()} has been removed from the process`);
-        mrsToDeliver = mrsToDeliver.filter((mr) => mr.getNumber() !== mrToRemove.getNumber());
-        this.canContinueDeliveryProcess(mrsToDeliver);
-        this.displayer.displayMrToDeliver(mrsToDeliver);
-        // eslint-disable-next-line no-await-in-loop
-        userRequestRemoveMR = await this.userInteractionHandler.handleAskUserIfHeWantsToRemoveMr();
-      } catch (error) {
-        this.logger.warning('Cancel MR removing selection');
-        userRequestRemoveMR = false;
-      }
-    }
-
-    this.logger.info('Continuing delivery process with the remaining MRs');
-    this.displayer.displayMrToDeliver(mrsToDeliver);
+    mrsToDeliver = await this.handleMRSelection(mrsToDeliver);
 
     const baseReleaseBranchName = GitTools.handleGitReleaseName(
       this.configuration.getReleaseBranchName(), this.configuration.getProfile(),
@@ -96,11 +79,19 @@ export default class EasyReleasePackager {
     const mergeStrategy = await this.userInteractionHandler
       .handleAskUserToChangeMergeStrategy(this.configuration.getMergeStrategy());
 
-    this.gitMergeHandler.handleMerge([], mergeStrategy);
+    let elementsToMerge : MergeableElement[] = [];
+    if (mergeStrategy === MergeStrategy.CHERRY_PICK) {
+      elementsToMerge = await this.handleCommitSelection(
+        await this.repository.getCommitsToCherryPick(mrsToDeliver),
+      );
+    } else {
+      this.logger.error('BRANCH MERGE IS NOT IMPLEMENTED YET');
+      process.exit(1);
+    }
 
-    const commitsToCherryPick = await this.repository.getCommitsToCherryPick(mrsToDeliver);
-    console.log(mergeStrategy);
-    console.log(commitsToCherryPick);
+    this.gitMergeHandler.handleMerge(elementsToMerge, mergeStrategy);
+
+    // console.log(elementsToMerge);
     console.log('CONTINUE');
   }
 
@@ -136,5 +127,85 @@ export default class EasyReleasePackager {
 
       process.exit();
     }
+  }
+
+  /** Stop the merge process if the running conditions are not met  * */
+  private canContinueMergeProcess(elementsToMerge : MergeableElement[]) : void {
+    if (elementsToMerge.length === 0) {
+      this.logger.info('No elements to merge --> delivery process end here');
+      this.logger.info('GoodBye !');
+
+      process.exit(0);
+    }
+  }
+
+  /** Enable the user to unselect mr to deliver * */
+  private async handleMRSelection(
+    mrsToDeliver : AbstractMergeRequest[],
+  ) : Promise<AbstractMergeRequest[]> {
+    let mrsSelected = mrsToDeliver;
+    let userRequestRemoveMR = await this.userInteractionHandler.handleAskUserIfHeWantsToRemoveMr();
+    while (userRequestRemoveMR && mrsSelected.length !== 0) {
+      this.logger.debug('User answered yes to remove a MR from the process');
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const mrToRemove = await this.userInteractionHandler.handleAskUserMrToRemove(mrsSelected);
+        this.logger.info(`The MR #${mrToRemove.getNumber()} has been removed from the process`);
+        mrsSelected = mrsSelected.filter((mr) => mr.getNumber() !== mrToRemove.getNumber());
+        this.canContinueDeliveryProcess(mrsSelected);
+        this.displayer.displayMrToDeliver(mrsSelected);
+        // eslint-disable-next-line no-await-in-loop
+        userRequestRemoveMR = await this.userInteractionHandler.handleAskUserIfHeWantsToRemoveMr();
+      } catch (error) {
+        this.logger.warning('Cancel MR removing selection');
+        userRequestRemoveMR = false;
+      }
+    }
+
+    this.logger.info('Continuing delivery process with the remaining MRs');
+    this.displayer.displayMrToDeliver(mrsToDeliver);
+
+    return mrsSelected;
+  }
+
+  /** Enable the user to unselect commit to merge * */
+  private async handleCommitSelection(
+    commitsToMerge : AbstractCommit[],
+  ) : Promise<AbstractCommit[]> {
+    let commitSelected = commitsToMerge;
+
+    this.logger.info('Theses commits are about to be delivered');
+    this.displayer.displayCommitsToMerge(commitsToMerge);
+
+    let userRequestRemoveCommit = await this.userInteractionHandler
+      .handleAskUserIfHeWantsToUnselectCommits();
+    while (userRequestRemoveCommit && commitSelected.length !== 0) {
+      this.logger.debug('User answered yes to remove a commit from the process');
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const commitToUnselect = await this.userInteractionHandler
+          .handleAskUserCommitToUnselect(commitSelected);
+
+        this.logger.info(`The commit ${commitToUnselect.getSha()} has been removed from the process`);
+
+        commitSelected = commitSelected
+          .filter((commit) => commit.getNodeId() !== commitToUnselect.getNodeId());
+
+        this.canContinueMergeProcess(commitSelected);
+
+        this.displayer.displayCommitsToMerge(commitSelected);
+        // eslint-disable-next-line no-await-in-loop
+        userRequestRemoveCommit = await this.userInteractionHandler
+          .handleAskUserIfHeWantsToUnselectCommits();
+      } catch (error) {
+        this.logger.warning('Cancel Commit removing selection');
+        userRequestRemoveCommit = false;
+      }
+    }
+
+    this.logger.info('Continuing merge process with the remaining Commits');
+    this.displayer.displayCommitsToMerge(commitSelected);
+
+    return commitSelected;
   }
 }

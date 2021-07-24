@@ -15,15 +15,15 @@ export default abstract class AbstractUser {
 
   /**            Accessors           * */
 
-  protected getName(): String {
+  getName(): String {
     return this.name;
   }
 
-  protected getUrl(): String {
+  getUrl(): String {
     return this.name;
   }
 
-  protected getId(): number {
+  getId(): number {
     return this.id;
   }
 }

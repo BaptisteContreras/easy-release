@@ -9,5 +9,6 @@ export default class GitCherryPick extends AbstractGitMergeStrategy {
   // eslint-disable-next-line class-methods-use-this
   mergeAll(mergeableCollection: MergeableElement[]): void {
     this.logger.info(`GitCherryPick handle merge of ${mergeableCollection.length} elements`);
+    console.log(mergeableCollection);
   }
 }

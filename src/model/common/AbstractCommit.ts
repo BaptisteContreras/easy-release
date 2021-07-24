@@ -1,6 +1,7 @@
 import AbstractUser from './AbstractUser';
+import MergeableElement from '../../utils/merge/MergeableElement';
 
-export default abstract class AbstractCommit {
+export default abstract class AbstractCommit implements MergeableElement {
   /**            Properties           * */
   protected sha: string;
 
@@ -45,5 +46,9 @@ export default abstract class AbstractCommit {
 
   getCommitter() : AbstractUser {
     return this.committer;
+  }
+
+  getMergeIdentifier(): string {
+    return this.getSha();
   }
 }
