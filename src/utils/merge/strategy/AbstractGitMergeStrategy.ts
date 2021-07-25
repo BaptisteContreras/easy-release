@@ -13,7 +13,7 @@ export default abstract class AbstractGitMergeStrategy implements GitMergeStrate
     this.gitDriver = gitDriver;
   }
 
-  abstract merge(element: MergeableElement): void;
+  abstract merge(element: MergeableElement): Promise<boolean>;
 
-  abstract mergeAll(mergeableCollection: MergeableElement[]): void;
+  abstract mergeAll(mergeableCollection: MergeableElement[]): Promise<boolean>;
 }

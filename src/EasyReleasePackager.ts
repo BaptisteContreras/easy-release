@@ -89,7 +89,7 @@ export default class EasyReleasePackager {
       process.exit(1);
     }
 
-    this.gitMergeHandler.handleMerge(elementsToMerge, mergeStrategy);
+    await this.gitMergeHandler.handleMerge(elementsToMerge, mergeStrategy);
 
     // console.log(elementsToMerge);
     console.log('CONTINUE');

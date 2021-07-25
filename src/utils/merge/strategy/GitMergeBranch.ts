@@ -3,10 +3,16 @@ import AbstractGitMergeStrategy from './AbstractGitMergeStrategy';
 
 export default class GitMergeBranch extends AbstractGitMergeStrategy {
   // eslint-disable-next-line class-methods-use-this
-  merge(element: MergeableElement): void {
+  merge(element: MergeableElement): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      reject();
+    });
   }
 
   // eslint-disable-next-line class-methods-use-this
-  mergeAll(mergeableCollection: MergeableElement[]): void {
+  mergeAll(mergeableCollection: MergeableElement[]): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      reject();
+    });
   }
 }

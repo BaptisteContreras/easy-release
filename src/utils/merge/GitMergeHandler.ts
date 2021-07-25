@@ -14,8 +14,8 @@ export default class GitMergeHandler {
     this.cherryPickStrategy = cherryPickStrategy;
   }
 
-  handleMerge(elementsToMerge : MergeableElement[], mergeStrategy : string) : void {
-    this.selectStrategy(mergeStrategy).mergeAll(elementsToMerge);
+  async handleMerge(elementsToMerge : MergeableElement[], mergeStrategy : string) : Promise<void> {
+    await this.selectStrategy(mergeStrategy).mergeAll(elementsToMerge);
   }
 
   private selectStrategy(mergeStrategy : string) : GitMergeStrategy {

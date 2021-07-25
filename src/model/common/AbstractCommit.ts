@@ -13,6 +13,10 @@ export default abstract class AbstractCommit implements MergeableElement {
 
   protected committer: AbstractUser;
 
+  protected merged: boolean;
+
+  protected conflict : boolean;
+
   /**            Constructor           * */
 
   constructor(
@@ -24,6 +28,8 @@ export default abstract class AbstractCommit implements MergeableElement {
     this.nodeId = nodeId;
     this.author = author;
     this.committer = committer;
+    this.merged = false;
+    this.conflict = false;
   }
 
   /**            Accessors           * */
@@ -50,5 +56,21 @@ export default abstract class AbstractCommit implements MergeableElement {
 
   getMergeIdentifier(): string {
     return this.getSha();
+  }
+
+  hasBeenMerged() : boolean {
+    return this.merged;
+  }
+
+  hasConflict() : boolean {
+    return this.conflict;
+  }
+
+  setMerged(merged : boolean) : void {
+    this.merged = merged;
+  }
+
+  setConflict(conflict : boolean) : void {
+    this.conflict = conflict;
   }
 }
