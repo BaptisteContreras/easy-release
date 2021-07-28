@@ -1,6 +1,6 @@
-import { spawn } from 'child_process';
 import LoggerInterface from '../../logger/LoggerInterface';
 import Configuration from '../../../model/configuration/Configuration';
+import GitMergeResult from '../../../model/git/GitMergeResult';
 
 const { exec } = require('child_process');
 
@@ -28,6 +28,14 @@ export default class GitDriver {
         cwd: this.configuration.getCwd(),
       });
 
+      process.stderr.on('data', (data : any) => {
+        this.logger.warning(data);
+      });
+
+      process.stdout.on('data', (data : any) => {
+        this.logger.debug(data);
+      });
+
       process.on('close', (retCode : number) => {
         if (retCode === 0) {
           resolve();
@@ -50,6 +58,13 @@ export default class GitDriver {
         cwd: this.configuration.getCwd(),
       });
 
+      process.stderr.on('data', (data : any) => {
+        this.logger.debug(data);
+      });
+
+      process.stdout.on('data', (data : any) => {
+        this.logger.warning(data);
+      });
       process.on('close', (retCode : number) => {
         if (retCode === 0) {
           resolve();
@@ -61,7 +76,7 @@ export default class GitDriver {
     });
   }
 
-  cherryPick(commitSha : string) : Promise<void> {
+  cherryPick(commitSha : string) : Promise<GitMergeResult> {
     return new Promise((resolve, reject) => {
       this.logger.info('cherry pick a commit');
       this.logger.debug(`GIT : execute "cd ${this.configuration.getCwd()} && git cherry-pick  ${commitSha}`);
@@ -69,31 +84,40 @@ export default class GitDriver {
         cwd: this.configuration.getCwd(),
       });
 
+      let errorData = '';
+
       process.stderr.on('data', (data : any) => {
-        console.log('err');
-        console.log(data);
-        // if (retCode === 0) {
-        //   resolve();
-        // } else {
-        //   this.logger.error(`cherryPick ${commitSha} : Failed with code ${retCode}`);
-        //   reject();
-        // }
+        this.logger.debug(data);
+        errorData += data;
       });
 
       process.stdout.on('data', (data : any) => {
-        console.log('out');
-        console.log(data);
-        // if (retCode === 0) {
-        //   resolve();
-        // } else {
-        //   this.logger.error(`cherryPick ${commitSha} : Failed with code ${retCode}`);
-        //   reject();
-        // }
+        this.logger.debug(data);
       });
 
       process.on('close', (retCode : number) => {
         console.log(retCode);
+        const hasConflict = errorData !== '' && this.hasCherryPickConflict(errorData);
+        resolve(new GitMergeResult(
+          retCode !== 0 && !hasConflict,
+          hasConflict,
+          errorData !== '' && this.hasCherryPickNoAction(errorData),
+          commitSha,
+
+        ));
       });
     });
+  }
+
+  /** Returns true if the git message contains a track of a conflict * */
+  // eslint-disable-next-line class-methods-use-this
+  private hasCherryPickConflict(gitMessage : string) : boolean {
+    return gitMessage.match('conflict') !== null;
+  }
+
+  /** Returns true if the git message contains a track that the commit is already on the branch * */
+  // eslint-disable-next-line class-methods-use-this
+  private hasCherryPickNoAction(gitMessage : string) : boolean {
+    return gitMessage.match('allow-empty') !== null;
   }
 }
