@@ -3,6 +3,7 @@ import MergeStrategy from '../../model/enum/MergeStrategy';
 import GitMergeBranch from './strategy/GitMergeBranch';
 import GitCherryPick from './strategy/GitCherryPick';
 import GitMergeStrategy from './strategy/GitMergeStrategy';
+import MergeCollectionResult from '../../model/merge/MergeCollectionResult';
 
 export default class GitMergeHandler {
   private mergeBranchStrategy : GitMergeBranch;
@@ -14,8 +15,10 @@ export default class GitMergeHandler {
     this.cherryPickStrategy = cherryPickStrategy;
   }
 
-  async handleMerge(elementsToMerge : MergeableElement[], mergeStrategy : string) : Promise<void> {
-    await this.selectStrategy(mergeStrategy).mergeAll(elementsToMerge);
+  async handleMerge(
+    elementsToMerge : MergeableElement[], mergeStrategy : string,
+  ) : Promise<MergeCollectionResult> {
+    return this.selectStrategy(mergeStrategy).mergeAll(elementsToMerge);
   }
 
   private selectStrategy(mergeStrategy : string) : GitMergeStrategy {

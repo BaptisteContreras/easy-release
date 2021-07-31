@@ -10,6 +10,7 @@ import GitMergeHandler from './utils/merge/GitMergeHandler';
 import MergeStrategy from './model/enum/MergeStrategy';
 import MergeableElement from './utils/merge/MergeableElement';
 import AbstractCommit from './model/common/AbstractCommit';
+import Release from './model/release/Release';
 
 export default class EasyReleasePackager {
   /**            Properties           * */
@@ -46,6 +47,7 @@ export default class EasyReleasePackager {
   }
 
   async startPackage() : Promise<void> {
+    const release = new Release();
     this.logger.info('Fetch MR to deliver');
     let mrsToDeliver = await this.repository.getMrToDeliver(
       this.configuration.getLabelsDeliver(),
@@ -56,6 +58,8 @@ export default class EasyReleasePackager {
     this.displayer.displayMrToDeliver(mrsToDeliver);
 
     mrsToDeliver = await this.handleMRSelection(mrsToDeliver);
+
+    release.setMr(mrsToDeliver);
 
     const baseReleaseBranchName = GitTools.handleGitReleaseName(
       this.configuration.getReleaseBranchName(), this.configuration.getProfile(),
@@ -89,10 +93,18 @@ export default class EasyReleasePackager {
       process.exit(1);
     }
 
-    await this.gitMergeHandler.handleMerge(elementsToMerge, mergeStrategy);
+    release.setElementsToMerge(elementsToMerge);
+
+    const mergeResult = await this.gitMergeHandler.handleMerge(elementsToMerge, mergeStrategy);
+
+    release.setMergeResult(mergeResult);
+    release.setConflict(mergeResult.hasConflict());
+    release.setError(mergeResult.hasError());
 
     // console.log(elementsToMerge);
-    console.log('CONTINUE');
+
+    release.terminate();
+    console.log(release);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -103,6 +115,7 @@ export default class EasyReleasePackager {
   async run() : Promise<void> {
     this.logger.info('EasyReleasePackager run');
     this.selectAction();
+    this.logger.info('EasyReleasePackager is done !');
   }
 
   /** Choose which action to do base on the CLI options * */
