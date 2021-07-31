@@ -27,10 +27,13 @@ export default class Configuration {
 
   private mergeStrategy : string;
 
+  private easyreleaseDirName : string;
+
   /**            Constructor           * */
   constructor(
     vcsConfiguration: AbstractVcsConfiguration, labelsDeliver : string[],
-    releaseBranchName : string, baseReleaseBranch : string, mergeStrategy : string,
+    releaseBranchName : string, baseReleaseBranch : string,
+    mergeStrategy : string, easyreleaseDirName : string,
   ) {
     this.vcsConfiguration = vcsConfiguration;
     this.verbose = false;
@@ -43,6 +46,7 @@ export default class Configuration {
     this.releaseBranchName = releaseBranchName;
     this.baseReleaseBranch = baseReleaseBranch;
     this.mergeStrategy = mergeStrategy;
+    this.easyreleaseDirName = easyreleaseDirName;
   }
 
   /**            Methods           * */
@@ -55,6 +59,7 @@ export default class Configuration {
       vcsConfiguration, parsedConfiguration.LABELS_DELIVER_NAME,
       parsedConfiguration.RELEASE_BRANCH_NAME, parsedConfiguration.BASE_RELEASE_BRANCH,
       parsedConfiguration.MERGE_STRATEGY,
+      parsedConfiguration.EASYRELEASE_DIR_NAME ? parsedConfiguration.EASYRELEASE_DIR_NAME : '.easyrelease',
     );
   }
 
@@ -109,5 +114,9 @@ export default class Configuration {
 
   getMergeStrategy() : string {
     return this.mergeStrategy;
+  }
+
+  getEasyreleaseDirName() : string {
+    return this.easyreleaseDirName;
   }
 }

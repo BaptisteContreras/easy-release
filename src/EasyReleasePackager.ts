@@ -11,6 +11,7 @@ import MergeStrategy from './model/enum/MergeStrategy';
 import MergeableElement from './utils/merge/MergeableElement';
 import AbstractCommit from './model/common/AbstractCommit';
 import Release from './model/release/Release';
+import ReleaseStorageHandler from './utils/release/storage/ReleaseStorageHandler';
 
 export default class EasyReleasePackager {
   /**            Properties           * */
@@ -29,11 +30,13 @@ export default class EasyReleasePackager {
 
   private gitMergeHandler : GitMergeHandler;
 
+  private releaseStorageHandler: ReleaseStorageHandler;
+
   constructor(
     repository : AbstractVcsRepository, configuration : Configuration,
     logger : LoggerInterface, displayer : InformationDisplayer,
     userInteractionHandler : UserInteractionHandler, gitDriver : GitDriver,
-    gitMergeHandler : GitMergeHandler,
+    gitMergeHandler : GitMergeHandler, releaseStorageHandler : ReleaseStorageHandler,
   ) {
     this.repository = repository;
     this.configuration = configuration;
@@ -42,6 +45,7 @@ export default class EasyReleasePackager {
     this.userInteractionHandler = userInteractionHandler;
     this.gitDriver = gitDriver;
     this.gitMergeHandler = gitMergeHandler;
+    this.releaseStorageHandler = releaseStorageHandler;
 
     this.logger.info('EasyReleasePackager application created !');
   }
@@ -104,6 +108,8 @@ export default class EasyReleasePackager {
     // console.log(elementsToMerge);
 
     release.terminate();
+
+    this.releaseStorageHandler.storeRelease(release);
     console.log(release);
   }
 

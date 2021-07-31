@@ -7,6 +7,7 @@ import UserInteractionHandlerFactory from './interaction/UserInteractionHandlerF
 import GitDriver from '../utils/driver/git/GitDriver';
 import GitDriverFactory from './driver/GitDriverFactory';
 import MergeHandlerFactory from './merge/MergeHandlerFactory';
+import ReleaseStorageHandlerFactory from './release/ReleaseStorageHandlerFactory';
 
 export default class MainFactory {
   public static createApplication(
@@ -23,6 +24,7 @@ export default class MainFactory {
       UserInteractionHandlerFactory.createTkInteractionHandler(),
       gitDriver,
       (new MergeHandlerFactory(logger, gitDriver)).createMergeHandler(),
+      ReleaseStorageHandlerFactory.createJsonReleaseStorageHandler(configuration, logger),
     );
   }
 }

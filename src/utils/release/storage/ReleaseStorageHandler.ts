@@ -1,10 +1,13 @@
 import ReleaseStorageDriver from './driver/ReleaseStorageDriver';
 import Configuration from '../../../model/configuration/Configuration';
 import Release from '../../../model/release/Release';
+import LoggerInterface from '../../logger/LoggerInterface';
 
 export default class ReleaseStorageHandler {
   /**            Properties           * */
   private storageDriver : ReleaseStorageDriver;
+
+  private logger : LoggerInterface;
 
   private cwd : string;
 
@@ -12,10 +15,13 @@ export default class ReleaseStorageHandler {
 
   /**            Construct           * */
 
-  constructor(storageDriver: ReleaseStorageDriver, configuration : Configuration) {
+  constructor(
+    storageDriver: ReleaseStorageDriver, configuration : Configuration, logger : LoggerInterface,
+  ) {
     this.storageDriver = storageDriver;
     this.cwd = configuration.getCwd();
-    this.easyreleaseDirName = '';
+    this.easyreleaseDirName = configuration.getEasyreleaseDirName();
+    this.logger = logger;
   }
 
   /**            Methods           * */

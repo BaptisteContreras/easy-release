@@ -44,6 +44,11 @@ const schemaDeclaration = {
     type: 'string',
     choices: [MergeStrategy.CHERRY_PICK, MergeStrategy.BRANCH_MERGE],
   } as ConfigurationSchema,
+  EASYRELEASE_DIR_NAME: {
+    name: 'EASYRELEASE_DIR_NAME',
+    required: false,
+    type: 'string',
+  } as ConfigurationSchema,
 };
 
 export interface ConfigurationSchema {
@@ -62,6 +67,7 @@ export interface RawConfiguration {
   RELEASE_BRANCH_NAME : string,
   BASE_RELEASE_BRANCH : string,
   MERGE_STRATEGY : string,
+  EASYRELEASE_DIR_NAME : string,
 }
 
 export default schemaDeclaration;
