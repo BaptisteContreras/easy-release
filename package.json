@@ -41,6 +41,7 @@
     "command-line-args": "^5.1.1",
     "command-line-usage": "^6.1.1",
     "dotenv": "^10.0.0",
-    "terminal-kit": "^2.1.5"
+    "terminal-kit": "^2.1.5",
+    "uuid": "^8.3.2"
   }
 }
