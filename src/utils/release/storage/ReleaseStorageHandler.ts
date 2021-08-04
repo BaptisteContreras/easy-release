@@ -20,6 +20,8 @@ export default class ReleaseStorageHandler {
 
   private releaseFileName : string;
 
+  private releaseHashFileName : string;
+
   /**            Construct           * */
 
   constructor(
@@ -30,6 +32,7 @@ export default class ReleaseStorageHandler {
     this.easyreleaseDirName = configuration.getEasyreleaseDirName();
     this.logger = logger;
     this.releaseFileName = 'release';
+    this.releaseHashFileName = 'releaseHash';
   }
 
   /**            Methods           * */
@@ -76,6 +79,10 @@ export default class ReleaseStorageHandler {
 
     this.storageDriver.store(
       release, FsTools.buildPath(releaseStorageDirNameFullPath, this.releaseFileName),
+    );
+
+    this.storageDriver.storeHash(
+      release, FsTools.buildPath(releaseStorageDirNameFullPath, this.releaseHashFileName), null,
     );
   }
 

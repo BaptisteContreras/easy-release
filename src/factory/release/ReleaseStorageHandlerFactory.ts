@@ -8,7 +8,7 @@ export default class ReleaseStorageHandlerFactory {
     configuration : Configuration, logger : LoggerInterface,
   ) : ReleaseStorageHandler {
     return new ReleaseStorageHandler(
-      new JsonReleaseStorageDriver(),
+      new JsonReleaseStorageDriver(logger),
       configuration,
       logger,
     );
