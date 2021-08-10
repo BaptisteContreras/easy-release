@@ -9,4 +9,7 @@ export default interface ReleaseStorageDriver {
    * a special hash algo (if supported by the driver implementation)
    * */
   storeHash(release : Release, location : string, hashAlgorithm : string | null) : void;
+
+  /** Store in a file the current release dir name * */
+  storeCurrent(releaseDirName: string, location: string): void;
 }

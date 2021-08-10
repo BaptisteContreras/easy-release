@@ -51,4 +51,16 @@ export default class JsonReleaseStorageDriver extends AbstractReleaseStorageDriv
       this.logger.info('Release hash saved on disk ! ');
     });
   }
+
+  storeCurrent(releaseDirName: string, location: string): void {
+    this.logger.debug(`Store current release dir name (${releaseDirName}) in current file located at ${location}`);
+    fs.writeFile(location, releaseDirName, (err : any) => {
+      if (err) {
+        this.logger.error('Store current release dir name failed with the following error');
+        this.logger.error(err);
+        process.exit(1);
+      }
+      this.logger.info('Current release name saved !');
+    });
+  }
 }

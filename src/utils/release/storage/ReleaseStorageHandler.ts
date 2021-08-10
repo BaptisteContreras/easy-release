@@ -22,6 +22,8 @@ export default class ReleaseStorageHandler {
 
   private releaseHashFileName : string;
 
+  private currentReleaseNameFile : string;
+
   /**            Construct           * */
 
   constructor(
@@ -33,6 +35,7 @@ export default class ReleaseStorageHandler {
     this.logger = logger;
     this.releaseFileName = 'release';
     this.releaseHashFileName = 'releaseHash';
+    this.currentReleaseNameFile = '.current';
   }
 
   /**            Methods           * */
@@ -84,11 +87,16 @@ export default class ReleaseStorageHandler {
     this.storageDriver.storeHash(
       release, FsTools.buildPath(releaseStorageDirNameFullPath, this.releaseHashFileName), null,
     );
+
+    this.storageDriver.storeCurrent(
+      releaseStorageDirName,
+      FsTools.buildPath(easyReleaseFullPath, this.currentReleaseNameFile),
+    );
   }
 
   private static generateReleaseStorageDirName() : string {
     const today = new Date();
 
-    return `${today.getFullYear()}_${today.getMonth() + 1}_${today.getDate()}U${uuid.v4()}`;
+    return `${today.getFullYear()}_${String(today.getMonth() + 1).padStart(2, '0')}_${String(today.getDate()).padStart(2, '0')}U${uuid.v4()}`;
   }
 }
