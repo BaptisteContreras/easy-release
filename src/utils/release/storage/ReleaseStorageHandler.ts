@@ -24,6 +24,8 @@ export default class ReleaseStorageHandler {
 
   private currentReleaseNameFile : string;
 
+  private easyReleaseFullPath : string;
+
   /**            Construct           * */
 
   constructor(
@@ -36,22 +38,14 @@ export default class ReleaseStorageHandler {
     this.releaseFileName = 'release';
     this.releaseHashFileName = 'releaseHash';
     this.currentReleaseNameFile = '.current';
+    this.easyReleaseFullPath = this.createEasyReleaseDir();
   }
 
   /**            Methods           * */
   storeRelease(release : Release) : void {
-    const easyReleaseFullPath = FsTools.buildPath(this.cwd, this.easyreleaseDirName);
-
-    this.logger.debug(`easyReleaseFullPath : ${easyReleaseFullPath}`);
-
-    if (!fs.existsSync(easyReleaseFullPath)) {
-      this.logger.warning(`easyReleaseFullPath : ${easyReleaseFullPath} doesn't exist, let's create it`);
-      fs.mkdirSync(easyReleaseFullPath);
-    }
-
     let releaseStorageDirName = ReleaseStorageHandler.generateReleaseStorageDirName();
     let releaseStorageDirNameFullPath = FsTools.buildPath(
-      easyReleaseFullPath, releaseStorageDirName,
+      this.easyReleaseFullPath, releaseStorageDirName,
     );
 
     this.logger.debug(`generate release dir name : ${releaseStorageDirName}`);
@@ -66,7 +60,7 @@ export default class ReleaseStorageHandler {
       }
       releaseStorageDirName = ReleaseStorageHandler.generateReleaseStorageDirName();
       releaseStorageDirNameFullPath = FsTools.buildPath(
-        easyReleaseFullPath, releaseStorageDirName,
+        this.easyReleaseFullPath, releaseStorageDirName,
       );
       this.logger.debug(`generate release dir name : ${releaseStorageDirName}`);
       this.logger.debug(`current release dir name full path : ${releaseStorageDirNameFullPath}`);
@@ -90,7 +84,34 @@ export default class ReleaseStorageHandler {
 
     this.storageDriver.storeCurrent(
       releaseStorageDirName,
-      FsTools.buildPath(easyReleaseFullPath, this.currentReleaseNameFile),
+      FsTools.buildPath(this.easyReleaseFullPath, this.currentReleaseNameFile),
+    );
+  }
+
+  /** Returns true is there is an active release that can be resume * */
+  public hasActiveRelease(): boolean {
+    if (fs.existsSync(FsTools.buildPath(this.easyReleaseFullPath, this.currentReleaseNameFile))) {
+      const activeReleaseDirName = fs.readFileSync(
+        FsTools.buildPath(this.easyReleaseFullPath, this.currentReleaseNameFile),
+      );
+
+      const activeReleaseDirExists = fs.existsSync(
+        FsTools.buildPath(this.easyReleaseFullPath, activeReleaseDirName),
+      );
+
+      if (!activeReleaseDirExists) {
+        this.logger.warning('Active release found but its directory is missing');
+      }
+
+      return activeReleaseDirExists;
+    }
+
+    return false;
+  }
+
+  public getActiveReleaseName(): string {
+    return fs.readFileSync(
+      FsTools.buildPath(this.easyReleaseFullPath, this.currentReleaseNameFile),
     );
   }
 
@@ -98,5 +119,18 @@ export default class ReleaseStorageHandler {
     const today = new Date();
 
     return `${today.getFullYear()}_${String(today.getMonth() + 1).padStart(2, '0')}_${String(today.getDate()).padStart(2, '0')}U${uuid.v4()}`;
+  }
+
+  private createEasyReleaseDir() : string {
+    const easyReleaseFullPath = FsTools.buildPath(this.cwd, this.easyreleaseDirName);
+
+    this.logger.debug(`easyReleaseFullPath : ${easyReleaseFullPath}`);
+
+    if (!fs.existsSync(easyReleaseFullPath)) {
+      this.logger.warning(`easyReleaseFullPath : ${easyReleaseFullPath} doesn't exist, let's create it`);
+      fs.mkdirSync(easyReleaseFullPath);
+    }
+
+    return easyReleaseFullPath;
   }
 }

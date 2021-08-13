@@ -51,6 +51,7 @@ export default class EasyReleasePackager {
   }
 
   async startPackage() : Promise<void> {
+    this.checkForActiveRelease();
     const release = new Release();
     this.logger.info('Fetch MR to deliver');
     let mrsToDeliver = await this.repository.getMrToDeliver(
@@ -111,6 +112,11 @@ export default class EasyReleasePackager {
 
     this.releaseStorageHandler.storeRelease(release);
     console.log(release);
+    if (release.hasConflict()) {
+      this.logger.warning('Conflict detected, resolve them then use resume option to continue the package where it stopped');
+    } else {
+      this.logger.info('Done !');
+    }
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -226,5 +232,16 @@ export default class EasyReleasePackager {
     this.displayer.displayCommitsToMerge(commitSelected);
 
     return commitSelected;
+  }
+
+  private checkForActiveRelease() : void {
+    this.logger.debug('Check for active release to resume');
+    if (this.releaseStorageHandler.hasActiveRelease()) {
+      this.logger.debug('Active release found !');
+      const activeReleaseName = this.releaseStorageHandler.getActiveReleaseName();
+      this.logger.info(`Active release name : ${activeReleaseName}`);
+    }
+
+    this.logger.info('No active release found');
   }
 }
