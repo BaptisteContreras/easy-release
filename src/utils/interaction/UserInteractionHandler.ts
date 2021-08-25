@@ -1,5 +1,4 @@
 import AbstractMergeRequest from '../../model/common/AbstractMergeRequest';
-import MergeStrategy from '../../model/enum/MergeStrategy';
 import AbstractCommit from '../../model/common/AbstractCommit';
 
 export default interface UserInteractionHandler {
@@ -20,5 +19,8 @@ export default interface UserInteractionHandler {
 
   /** This method let the user pick a commit to unselect from the merge  * */
   handleAskUserCommitToUnselect(commitsToMerge : AbstractCommit[]): Promise<AbstractCommit>
+
+  /** This methods returns true if the user wants to resume an active release */
+  handleAskUserIfHeWantsToResumeTheActiveRelease(activeReleaseName: string) : Promise<boolean>;
 
 }

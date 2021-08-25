@@ -12,4 +12,7 @@ export default interface ReleaseStorageDriver {
 
   /** Store in a file the current release dir name * */
   storeCurrent(releaseDirName: string, location: string): void;
+
+  /** Read the release stored in the given location. We also check the hash of the data * */
+  readReleaseData(location: string, hashLocation: string): object;
 }

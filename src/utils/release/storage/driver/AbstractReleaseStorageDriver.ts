@@ -18,4 +18,6 @@ export default abstract class AbstractReleaseStorageDriver implements ReleaseSto
   abstract storeHash(release: Release, location: string, hashAlgorithm: string | null): void;
 
   abstract storeCurrent(releaseDirName: string, location: string): void;
+
+  abstract readReleaseData(location: string, hashLocation: string): object;
 }

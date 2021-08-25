@@ -51,7 +51,12 @@ export default class EasyReleasePackager {
   }
 
   async startPackage() : Promise<void> {
-    this.checkForActiveRelease();
+    if (await this.checkForActiveRelease()) {
+      await this.resumePackage(true);
+
+      return;
+    }
+
     const release = new Release();
     this.logger.info('Fetch MR to deliver');
     let mrsToDeliver = await this.repository.getMrToDeliver(
@@ -110,37 +115,46 @@ export default class EasyReleasePackager {
 
     release.terminate();
 
-    this.releaseStorageHandler.storeRelease(release);
+    await this.releaseStorageHandler.storeRelease(release);
     console.log(release);
     if (release.hasConflict()) {
-      this.logger.warning('Conflict detected, resolve them then use resume option to continue the package where it stopped');
+      this.logger.warning('Conflict detected, resolve it then use resume option to continue the package where it stopped');
     } else {
       this.logger.info('Done !');
     }
   }
 
   // eslint-disable-next-line class-methods-use-this
-  resumePackage() : void {
+  async resumePackage(alreadyCheck : boolean = false) : Promise<void> {
+    if (!alreadyCheck && !(await this.checkForActiveRelease())) {
+      this.logger.info('resume release end here.');
+      process.exit(0);
+    }
 
+    const releaseName = this.releaseStorageHandler.getActiveReleaseName();
+
+    this.logger.info(`Resume ${releaseName}`);
+
+    this.releaseStorageHandler.loadRelease(releaseName);
   }
 
   async run() : Promise<void> {
     this.logger.info('EasyReleasePackager run');
-    this.selectAction();
+    await this.selectAction();
     this.logger.info('EasyReleasePackager is done !');
   }
 
   /** Choose which action to do base on the CLI options * */
-  private selectAction() : void {
+  private async selectAction() : Promise<void> {
     if (this.configuration.isRelease()) {
       this.logger.info('release action');
-      this.startPackage();
+      await this.startPackage();
     } else if (this.configuration.isResume()) {
       this.logger.info('resume action');
-      this.resumePackage();
+      await this.resumePackage();
     } else {
       this.logger.info('default action : release');
-      this.startPackage();
+      await this.startPackage();
     }
   }
 
@@ -170,6 +184,7 @@ export default class EasyReleasePackager {
   ) : Promise<AbstractMergeRequest[]> {
     let mrsSelected = mrsToDeliver;
     let userRequestRemoveMR = await this.userInteractionHandler.handleAskUserIfHeWantsToRemoveMr();
+
     while (userRequestRemoveMR && mrsSelected.length !== 0) {
       this.logger.debug('User answered yes to remove a MR from the process');
       try {
@@ -204,6 +219,7 @@ export default class EasyReleasePackager {
 
     let userRequestRemoveCommit = await this.userInteractionHandler
       .handleAskUserIfHeWantsToUnselectCommits();
+
     while (userRequestRemoveCommit && commitSelected.length !== 0) {
       this.logger.debug('User answered yes to remove a commit from the process');
       try {
@@ -234,14 +250,23 @@ export default class EasyReleasePackager {
     return commitSelected;
   }
 
-  private checkForActiveRelease() : void {
+  /** Returns true is the user wants to resume the current release * */
+  private async checkForActiveRelease() : Promise<boolean> {
     this.logger.debug('Check for active release to resume');
+
     if (this.releaseStorageHandler.hasActiveRelease()) {
       this.logger.debug('Active release found !');
+
       const activeReleaseName = this.releaseStorageHandler.getActiveReleaseName();
+
       this.logger.info(`Active release name : ${activeReleaseName}`);
+
+      return this.userInteractionHandler
+        .handleAskUserIfHeWantsToResumeTheActiveRelease(activeReleaseName);
     }
 
     this.logger.info('No active release found');
+
+    return false;
   }
 }

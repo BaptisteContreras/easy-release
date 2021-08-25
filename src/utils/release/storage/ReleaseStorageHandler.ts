@@ -3,6 +3,7 @@ import Configuration from '../../../model/configuration/Configuration';
 import Release from '../../../model/release/Release';
 import LoggerInterface from '../../logger/LoggerInterface';
 import FsTools from '../../tools/FsTools';
+import ReleaseBuilder from '../../builder/release/ReleaseBuilder';
 
 const uuid = require('uuid');
 
@@ -113,6 +114,17 @@ export default class ReleaseStorageHandler {
     return fs.readFileSync(
       FsTools.buildPath(this.easyReleaseFullPath, this.currentReleaseNameFile),
     );
+  }
+
+  public loadRelease(releaseName: string): Release {
+    const rawRelease = this.storageDriver.readReleaseData(
+      FsTools.buildPath(this.easyReleaseFullPath, `${releaseName}/${this.releaseFileName}`),
+      FsTools.buildPath(this.easyReleaseFullPath, `${releaseName}/${this.releaseHashFileName}`),
+    );
+
+    this.logger.debug('Raw release loaded, time to call the builder...');
+
+    return ReleaseBuilder.buildFromLoadedData(rawRelease);
   }
 
   private static generateReleaseStorageDirName() : string {

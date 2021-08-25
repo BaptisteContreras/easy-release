@@ -118,4 +118,18 @@ export default class TkUserInteractionHandler implements UserInteractionHandler 
       });
     });
   }
+
+  // eslint-disable-next-line class-methods-use-this
+  handleAskUserIfHeWantsToResumeTheActiveRelease(activeReleaseName: string) : Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      term(`Do you want to resume this release : ${activeReleaseName} ? [y|N]\n`);
+      term.yesOrNo({ yes: ['y'], no: ['n', 'ENTER'] }, (error : any, result : boolean) => {
+        if (result) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      });
+    });
+  }
 }

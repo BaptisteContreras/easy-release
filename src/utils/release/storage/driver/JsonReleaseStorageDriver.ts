@@ -2,6 +2,7 @@ import { sha512 } from 'js-sha512';
 import ReleaseStorageDriver from './ReleaseStorageDriver';
 import Release from '../../../../model/release/Release';
 import AbstractReleaseStorageDriver from './AbstractReleaseStorageDriver';
+import FsTools from '../../../tools/FsTools';
 
 const fs = require('fs');
 
@@ -62,5 +63,40 @@ export default class JsonReleaseStorageDriver extends AbstractReleaseStorageDriv
       }
       this.logger.info('Current release name saved !');
     });
+  }
+
+  readReleaseData(location: string, hashLocation: string): object {
+    const fullLocation = `${location}.json`;
+    const fullHashLocation = `${hashLocation}.json`;
+    this.logger.debug(`Read data in ${fullLocation}`);
+    this.logger.debug(`Read hash in ${fullHashLocation}`);
+    const rawData = fs.readFileSync(fullLocation, {
+      encoding: 'UTF-8',
+    });
+    const rawHashData = fs.readFileSync(fullHashLocation, {
+      encoding: 'UTF-8',
+    });
+    const parsedHashData = JSON.parse(rawHashData);
+
+    const { metaHash } = parsedHashData;
+    parsedHashData.metaHash = '';
+
+    if (metaHash !== sha512(JSON.stringify(parsedHashData))) {
+      this.logger.error('Metadata corrupted');
+      process.exit(1);
+    }
+
+    this.logger.debug('Metadata ok');
+
+    if (parsedHashData.hash !== sha512(rawData)) {
+      this.logger.error('Data corrupted');
+      process.exit(1);
+    }
+
+    const parsedData = JSON.parse(rawData);
+
+    this.logger.debug('Data ok');
+
+    return parsedData;
   }
 }
