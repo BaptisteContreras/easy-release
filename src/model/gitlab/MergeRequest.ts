@@ -2,6 +2,7 @@ import GitlabUser from './GitlabUser';
 import AbstractMergeRequest from '../common/AbstractMergeRequest';
 import AbstractIssue from '../common/AbstractIssue';
 import GitlabIssue from './GitlabIssue';
+import InternalType from '../enum/InternalType';
 
 export default class MergeRequest extends AbstractMergeRequest {
   /**            Constructor           * */
@@ -17,6 +18,7 @@ export default class MergeRequest extends AbstractMergeRequest {
       body, linkedIssueId, state,
       createdAt, updatedAt, number,
     );
+    this.internalType = InternalType.MERGE_REQUEST;
   }
 
   setLinkedIssue(issue: AbstractIssue) {

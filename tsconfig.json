@@ -1,14 +1,16 @@
 {
   "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "rootDir": ".",
     "outDir": "build",
     "lib": ["ESNext"],
-    "typeRoots": [ "./types", "./node_modules/@types"],
+    "typeRoots": [ "./types", "./node_modules/@types"]
   },
   "include": [
     "src/**/*.ts",
     "test/**/*.ts"
   ],
-  "noImplicitAny" : true
+  "noImplicitAny" : true,
 }

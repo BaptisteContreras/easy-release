@@ -5,6 +5,7 @@
   },
   "rules": {
     "no-unused-vars": "off",
+    "no-spaced-func": "off",
     "@typescript-eslint/no-unused-vars": ["warn"]
   }
 

@@ -1,6 +1,10 @@
+import { Type } from 'class-transformer';
 import AbstractUser from './AbstractUser';
 import AbstractIssue from './AbstractIssue';
 import AbstractCommit from './AbstractCommit';
+import InternalType from '../enum/InternalType';
+import GithubCommit from '../github/GithubCommit';
+import GitlabCommit from '../gitlab/GitlabCommit';
 
 export default abstract class AbstractMergeRequest {
   /**            Properties           * */
@@ -24,7 +28,10 @@ export default abstract class AbstractMergeRequest {
 
   protected number : number;
 
+  @Type(() => AbstractCommit)
   protected commits : AbstractCommit[];
+
+  protected internalType : string;
 
   /**            Constructor           * */
 
@@ -44,6 +51,7 @@ export default abstract class AbstractMergeRequest {
     this.linkedIssue = null;
     this.number = number;
     this.commits = [];
+    this.internalType = '';
   }
 
   /**            Accessors           * */
@@ -98,6 +106,10 @@ export default abstract class AbstractMergeRequest {
 
   addCommit(commit : AbstractCommit) : void {
     this.commits.push(commit);
+  }
+
+  getInternalType(): string {
+    return this.internalType;
   }
 
   public abstract isOpen() : boolean;

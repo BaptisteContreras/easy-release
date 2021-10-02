@@ -1,5 +1,8 @@
+import { Type } from 'class-transformer';
 import AbstractUser from './AbstractUser';
 import MergeableElement from '../../utils/merge/MergeableElement';
+
+require('reflect-metadata');
 
 export default abstract class AbstractCommit implements MergeableElement {
   /**            Properties           * */
@@ -15,11 +18,13 @@ export default abstract class AbstractCommit implements MergeableElement {
 
   protected merged: boolean;
 
-  protected conflict : boolean;
+  protected conflict: boolean;
+
+  protected internalType: String;
 
   /**            Constructor           * */
 
-  constructor(
+  protected constructor(
     sha: string, message: string, nodeId: string,
     author: AbstractUser, committer: AbstractUser,
   ) {
@@ -30,6 +35,7 @@ export default abstract class AbstractCommit implements MergeableElement {
     this.committer = committer;
     this.merged = false;
     this.conflict = false;
+    this.internalType = '';
   }
 
   /**            Accessors           * */

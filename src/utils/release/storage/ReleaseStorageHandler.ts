@@ -27,10 +27,13 @@ export default class ReleaseStorageHandler {
 
   private easyReleaseFullPath : string;
 
+  private releaseBuilder: ReleaseBuilder;
+
   /**            Construct           * */
 
   constructor(
-    storageDriver: ReleaseStorageDriver, configuration : Configuration, logger : LoggerInterface,
+    storageDriver: ReleaseStorageDriver, configuration : Configuration,
+    logger : LoggerInterface, releaseBuilder: ReleaseBuilder,
   ) {
     this.storageDriver = storageDriver;
     this.cwd = configuration.getCwd();
@@ -40,6 +43,7 @@ export default class ReleaseStorageHandler {
     this.releaseHashFileName = 'releaseHash';
     this.currentReleaseNameFile = '.current';
     this.easyReleaseFullPath = this.createEasyReleaseDir();
+    this.releaseBuilder = releaseBuilder;
   }
 
   /**            Methods           * */
@@ -124,7 +128,7 @@ export default class ReleaseStorageHandler {
 
     this.logger.debug('Raw release loaded, time to call the builder...');
 
-    return ReleaseBuilder.buildFromLoadedData(rawRelease);
+    return this.releaseBuilder.buildFromLoadedData(rawRelease);
   }
 
   private static generateReleaseStorageDirName() : string {

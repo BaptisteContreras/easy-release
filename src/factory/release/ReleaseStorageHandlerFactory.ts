@@ -2,6 +2,7 @@ import ReleaseStorageHandler from '../../utils/release/storage/ReleaseStorageHan
 import Configuration from '../../model/configuration/Configuration';
 import JsonReleaseStorageDriver from '../../utils/release/storage/driver/JsonReleaseStorageDriver';
 import LoggerInterface from '../../utils/logger/LoggerInterface';
+import ReleaseBuilder from '../../utils/builder/release/ReleaseBuilder';
 
 export default class ReleaseStorageHandlerFactory {
   public static createJsonReleaseStorageHandler(
@@ -11,6 +12,7 @@ export default class ReleaseStorageHandlerFactory {
       new JsonReleaseStorageDriver(logger),
       configuration,
       logger,
+      new ReleaseBuilder(logger),
     );
   }
 }

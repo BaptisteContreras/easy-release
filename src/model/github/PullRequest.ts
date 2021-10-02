@@ -2,6 +2,7 @@ import GithubUser from './GithubUser';
 import AbstractMergeRequest from '../common/AbstractMergeRequest';
 import AbstractIssue from '../common/AbstractIssue';
 import GithubIssue from './GithubIssue';
+import InternalType from '../enum/InternalType';
 
 export default class PullRequest extends AbstractMergeRequest {
   /**            Constructor           * */
@@ -17,6 +18,8 @@ export default class PullRequest extends AbstractMergeRequest {
       body, linkedIssueId, state,
       createdAt, updatedAt, number,
     );
+
+    this.internalType = InternalType.PULL_REQUEST;
   }
 
   setLinkedIssue(issue: AbstractIssue) {
