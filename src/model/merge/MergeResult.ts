@@ -1,5 +1,3 @@
-import MergeableElement from '../../utils/merge/MergeableElement';
-
 export default abstract class MergeResult {
   private error : boolean;
 
@@ -11,6 +9,8 @@ export default abstract class MergeResult {
 
   private mergeId : string;
 
+  protected internalType: string;
+
   constructor(
     error: boolean, conflict: boolean, noAction: boolean,
     processed: boolean, mergeId: string,
@@ -19,6 +19,7 @@ export default abstract class MergeResult {
     this.conflict = conflict;
     this.noAction = noAction;
     this.mergeId = mergeId;
+    this.internalType = '';
     this.processed = processed;
   }
 
@@ -40,5 +41,9 @@ export default abstract class MergeResult {
 
   hasBeenProcessed() : boolean {
     return this.processed;
+  }
+
+  getInternalType(): string {
+    return this.internalType;
   }
 }

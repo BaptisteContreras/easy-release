@@ -1,6 +1,7 @@
 import GitlabUser from './GitlabUser';
 import AbstractIssue from '../common/AbstractIssue';
 import GitlabLabel from './GitlabLabel';
+import InternalType from '../enum/InternalType';
 
 export default class GitlabIssue extends AbstractIssue {
   /**            Constructor           * */
@@ -11,5 +12,6 @@ export default class GitlabIssue extends AbstractIssue {
     owner: GitlabUser, id: number, number: number,
   ) {
     super(name, url, labels, owner, id, number);
+    this.internalType = InternalType.GITLAB_ISSUE;
   }
 }

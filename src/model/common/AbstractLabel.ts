@@ -8,6 +8,8 @@ export default abstract class AbstractLabel {
 
   protected description: string;
 
+  protected internalType: string;
+
   /**            Constructor           * */
 
   constructor(name: String, url: String, id: number, description: string) {
@@ -15,6 +17,7 @@ export default abstract class AbstractLabel {
     this.url = url;
     this.id = id;
     this.description = description;
+    this.internalType = '';
   }
 
   /**            Accessors           * */
@@ -33,5 +36,9 @@ export default abstract class AbstractLabel {
 
   public getDescription(): String {
     return this.description;
+  }
+
+  public getInternalType(): string {
+    return this.internalType;
   }
 }

@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import UsageDefinition from './model/options/UsageDefinition';
 import MainFactory from './factory/MainFactory';
 import ConfigurationReaderFactory from './factory/configuration/ConfigurationReaderFactory';

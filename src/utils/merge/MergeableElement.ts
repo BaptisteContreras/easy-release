@@ -5,4 +5,6 @@ export default interface MergeableElement {
   setConflict(conflict : boolean) : void;
 
   setMerged(merged : boolean) : void;
+
+  getInternalType(): string;
 }

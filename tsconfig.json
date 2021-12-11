@@ -6,7 +6,7 @@
     "rootDir": ".",
     "outDir": "build",
     "lib": ["ESNext"],
-    "typeRoots": [ "./types", "./node_modules/@types"]
+    "typeRoots": [ "./types", "./node_modules/@types", "reflect-metadata"]
   },
   "include": [
     "src/**/*.ts",

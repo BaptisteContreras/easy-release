@@ -12,15 +12,17 @@ export default abstract class AbstractCommit implements MergeableElement {
 
   protected nodeId: string;
 
+  @Type(() => AbstractUser)
   protected author: AbstractUser;
 
+  @Type(() => AbstractUser)
   protected committer: AbstractUser;
 
   protected merged: boolean;
 
   protected conflict: boolean;
 
-  protected internalType: String;
+  protected internalType: string;
 
   /**            Constructor           * */
 
@@ -78,5 +80,17 @@ export default abstract class AbstractCommit implements MergeableElement {
 
   setConflict(conflict : boolean) : void {
     this.conflict = conflict;
+  }
+
+  getInternalType(): string {
+    return this.internalType;
+  }
+
+  setAuthor(author: AbstractUser): void {
+    this.author = author;
+  }
+
+  setCommitter(committer: AbstractUser): void {
+    this.committer = committer;
   }
 }

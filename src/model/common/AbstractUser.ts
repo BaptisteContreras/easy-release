@@ -6,11 +6,14 @@ export default abstract class AbstractUser {
 
   protected id: number;
 
+  protected internalType : string;
+
   /**            Constructor           * */
   constructor(name: String, url: String, id: number) {
     this.name = name;
     this.url = url;
     this.id = id;
+    this.internalType = '';
   }
 
   /**            Accessors           * */
@@ -25,5 +28,9 @@ export default abstract class AbstractUser {
 
   getId(): number {
     return this.id;
+  }
+
+  getInternalType(): string {
+    return this.internalType;
   }
 }

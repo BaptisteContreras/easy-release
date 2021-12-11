@@ -3,13 +3,9 @@ import AbstractMergeRequest from '../common/AbstractMergeRequest';
 import MergeableElement from '../../utils/merge/MergeableElement';
 import MergeCollectionResult from '../merge/MergeCollectionResult';
 import InternalType from '../enum/InternalType';
-import PullRequest from '../github/PullRequest';
-import MergeRequest from '../gitlab/MergeRequest';
 import GithubCommit from '../github/GithubCommit';
 import GitlabCommit from '../gitlab/GitlabCommit';
 import AbstractCommit from '../common/AbstractCommit';
-
-require('reflect-metadata');
 
 export default class Release {
   /**            Properties           * */

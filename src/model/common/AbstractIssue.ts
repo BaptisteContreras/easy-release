@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import AbstractLabel from './AbstractLabel';
 import AbstractUser from './AbstractUser';
 
@@ -7,13 +8,17 @@ export default abstract class AbstractIssue {
 
   protected url: String;
 
+  @Type(() => AbstractLabel)
   protected labels: AbstractLabel[];
 
+  @Type(() => AbstractUser)
   protected owner : AbstractUser;
 
   protected id: number;
 
   protected number: number;
+
+  protected internalType: string;
 
   /**            Constructor           * */
 
@@ -27,6 +32,7 @@ export default abstract class AbstractIssue {
     this.owner = owner;
     this.id = id;
     this.number = number;
+    this.internalType = '';
   }
 
   /**            Methods           * */
@@ -76,5 +82,17 @@ export default abstract class AbstractIssue {
 
   public getNumber(): number {
     return this.number;
+  }
+
+  public getInternalType(): string {
+    return this.internalType;
+  }
+
+  public setOwner(owner: AbstractUser): void {
+    this.owner = owner;
+  }
+
+  public setLabels(labels: AbstractLabel[]): void {
+    this.labels = labels;
   }
 }

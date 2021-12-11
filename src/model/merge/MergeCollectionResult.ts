@@ -1,5 +1,12 @@
+import { Type, TypeHelpOptions } from 'class-transformer';
 import MergeableElement from '../../utils/merge/MergeableElement';
 import MergeResult from './MergeResult';
+import InternalType from '../enum/InternalType';
+import GithubCommit from '../github/GithubCommit';
+import GitlabCommit from '../gitlab/GitlabCommit';
+import AbstractCommit from '../common/AbstractCommit';
+import AbstractMergeRequest from '../common/AbstractMergeRequest';
+import CherryPickMergeResult from './CherryPickMergeResult';
 
 export default class MergeCollectionResult {
   /**            Properties           * */
@@ -7,10 +14,47 @@ export default class MergeCollectionResult {
 
   private conflict : boolean;
 
+  @Type((item : TypeHelpOptions | undefined) => {
+    const rawObject = item?.object;
+
+    if (rawObject && rawObject.lastMergedElement) {
+      const firstElement = rawObject.lastMergedElement;
+      if (firstElement.internalType === InternalType.GITHUB_COMMIT) {
+        return GithubCommit;
+      }
+      switch (firstElement.internalType) {
+        case InternalType.GITHUB_COMMIT:
+          return GithubCommit;
+        case InternalType.GITLAB_COMMIT:
+          return GitlabCommit;
+        default: throw new Error('Deserialization error');
+      }
+    }
+    return AbstractCommit;
+  })
   private lastMergedElement : MergeableElement | null;
 
+  @Type((item : TypeHelpOptions | undefined) => {
+    const rawObject = item?.object;
+    if (rawObject && rawObject.lastMergeResult.internalType === InternalType.CHERRY_PICK) {
+      return CherryPickMergeResult;
+    }
+
+    return MergeResult;
+  })
   private lastMergeResult : MergeResult | null;
 
+  @Type((item : TypeHelpOptions | undefined) => {
+    const rawObject = item?.object;
+
+    if (rawObject && rawObject.mergeResultCollection) {
+      const firstElement = rawObject.mergeResultCollection[0];
+      if (firstElement.internalType === InternalType.CHERRY_PICK) {
+        return CherryPickMergeResult;
+      }
+    }
+    return MergeResult;
+  })
   private mergeResultCollection : MergeResult[];
 
   /**            Constructor           * */
