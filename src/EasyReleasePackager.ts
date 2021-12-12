@@ -58,10 +58,12 @@ export default class EasyReleasePackager {
     }
 
     const release = new Release();
+
     this.logger.info('Fetch MR to deliver');
     let mrsToDeliver = await this.repository.getMrToDeliver(
       this.configuration.getLabelsDeliver(),
     );
+
     this.logger.info(`${mrsToDeliver.length} MR to deliver found`);
     this.canContinueDeliveryProcess(mrsToDeliver);
 
@@ -81,6 +83,8 @@ export default class EasyReleasePackager {
       .handleAskUserToChangeReleaseBranchName(baseReleaseBranchName);
 
     this.logger.info(`${releaseBranchName} is the current release branch name`);
+
+    release.setBranchName(releaseBranchName);
 
     await this.gitDriver.checkoutAndPullBaseBranch(
       this.configuration.getBaseReleaseBranch(),
@@ -113,18 +117,19 @@ export default class EasyReleasePackager {
 
     // console.log(elementsToMerge);
 
-    release.terminate();
-
-    await this.releaseStorageHandler.storeRelease(release);
-    console.log(release);
     if (release.hasConflict()) {
+      release.pause();
       this.logger.warning('Conflict detected, resolve it then use resume option to continue the package where it stopped');
     } else {
+      release.terminate();
       this.logger.info('Done !');
     }
+
+    console.log(release);
+
+    await this.releaseStorageHandler.storeRelease(release);
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async resumePackage(alreadyCheck : boolean = false) : Promise<void> {
     if (!alreadyCheck && !(await this.checkForActiveRelease())) {
       this.logger.info('resume release end here.');
@@ -135,7 +140,29 @@ export default class EasyReleasePackager {
 
     this.logger.info(`Resume ${releaseName}`);
 
-    this.releaseStorageHandler.loadRelease(releaseName);
+    const release = this.releaseStorageHandler.loadRelease(releaseName);
+
+    this.logger.info('Release loaded');
+
+    const isStatusStable = await this.gitDriver.isGitStatusStable();
+
+    if (isStatusStable) {
+      this.logger.info('Conflict is resolved ! Lets continue');
+      console.log(release);
+
+      const currentBranchName = await this.gitDriver.getCurrentBranchName();
+
+      if (currentBranchName !== release.getBranchName()) {
+        this.logger.error('You are not currently on the good release branch name');
+        this.logger.error(`Branch expected : ${release.getBranchName()} but currently :${currentBranchName}`);
+        process.exit(1);
+      }
+
+      process.exit(0);
+    }
+
+    this.logger.error('Conflict is not resolved ! We stop here');
+    process.exit(1);
   }
 
   async run() : Promise<void> {

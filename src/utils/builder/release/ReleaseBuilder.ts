@@ -32,39 +32,6 @@ export default class ReleaseBuilder {
   public buildFromLoadedData(loadedData: any) : Release {
     const release = plainToClass(Release, loadedData);
 
-    // We want to have the same AbstractCommit instance in the MRs if they have the same nodeId
-    // TODO
-    // We want to replace Commits in ElementsToMerge with commits in Mrs
-    // if (
-    //   release.getElementsToMerge().length
-    //     && release.getElementsToMerge()[0] instanceof AbstractCommit) {
-    //   const allCommits = release.getMrs()
-    //     .map((mr : AbstractMergeRequest) => mr.getCommits())
-    //     .flat();
-    //
-    //   const newElementsToMerge : MergeableElement[] = [];
-    //   const commitsDone : String[] = [];
-    //
-    //   release.getElementsToMerge().forEach((el : MergeableElement) => {
-    //     const currentMID = el.getMergeIdentifier();
-    //     if (!commitsDone.includes(currentMID)) {
-    //       commitsDone.push(currentMID);
-    //       const commit = allCommits
-    //         .filter(
-    //           (currentCommit : AbstractCommit) =>
-    //           currentCommit.getMergeIdentifier() === currentMID,
-    //         );
-    //       if (!commit.length) {
-    //         throw new Error(`Deserialization e
-    //         rror : Commit merge failed, ${currentMID} not found in MRs`);
-    //       }
-    //
-    //       newElementsToMerge.push(commit[0]);
-    //     }
-    //   });
-    //   release.setElementsToMerge(newElementsToMerge);
-    // }
-
     // We create a new set of unique MR object
     const newMrs : AbstractMergeRequest[] = [];
     release.getMrs().forEach((el: AbstractMergeRequest) => {
@@ -150,7 +117,7 @@ export default class ReleaseBuilder {
         ),
       );
     }
-    console.log(release);
+
     return release;
   }
 

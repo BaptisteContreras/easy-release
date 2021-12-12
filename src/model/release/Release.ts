@@ -46,6 +46,12 @@ export default class Release {
   @Type(() => MergeCollectionResult)
   private mergesResult : MergeCollectionResult | null;
 
+  private pauseEnd : Date | null;
+
+  private paused : boolean;
+
+  private branchName: string;
+
   /**            Constructor           * */
 
   constructor() {
@@ -57,6 +63,9 @@ export default class Release {
     this.start = new Date();
     this.end = null;
     this.mergesResult = null;
+    this.pauseEnd = null;
+    this.paused = false;
+    this.branchName = '';
   }
 
   /**            Methods           * */
@@ -64,6 +73,12 @@ export default class Release {
   terminate() : void {
     this.terminated = true;
     this.end = new Date();
+    this.paused = false;
+  }
+
+  pause() : void {
+    this.pauseEnd = new Date();
+    this.paused = true;
   }
   /**            Accessors           * */
 
@@ -129,5 +144,17 @@ export default class Release {
 
   setMergeResult(mergeResult : MergeCollectionResult) : void {
     this.mergesResult = mergeResult;
+  }
+
+  isPaused(): boolean {
+    return this.paused;
+  }
+
+  getBranchName(): string {
+    return this.branchName;
+  }
+
+  setBranchName(branchName: string): void {
+    this.branchName = branchName;
   }
 }

@@ -97,11 +97,11 @@ export default class GitDriver {
 
       process.on('close', (retCode : number) => {
         console.log(retCode);
-        const hasConflict = errorData !== '' && this.hasCherryPickConflict(errorData);
+        const hasConflict = errorData !== '' && GitDriver.hasCherryPickConflict(errorData);
         resolve(new GitMergeResult(
           retCode !== 0 && !hasConflict,
           hasConflict,
-          errorData !== '' && this.hasCherryPickNoAction(errorData),
+          errorData !== '' && GitDriver.hasCherryPickNoAction(errorData),
           commitSha,
 
         ));
@@ -109,15 +109,83 @@ export default class GitDriver {
     });
   }
 
+  /** No rebase, conflict or merge * */
+  isGitStatusStable(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.logger.info('git status');
+      this.logger.debug(`GIT : execute "cd ${this.configuration.getCwd()} && git status`);
+      const process = exec('git status', {
+        cwd: this.configuration.getCwd(),
+      });
+
+      let errorData = '';
+      let outputData = '';
+
+      process.stderr.on('data', (data : any) => {
+        this.logger.debug(data);
+        errorData += data;
+      });
+
+      process.stdout.on('data', (data : any) => {
+        this.logger.debug(data);
+        outputData += data;
+      });
+
+      process.on('close', (retCode : number) => {
+        resolve(
+          retCode === 0 && GitDriver.isStatusOk(outputData) && GitDriver.isStatusOk(errorData),
+        );
+      });
+    });
+  }
+
+  getCurrentBranchName(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      this.logger.info('git status (get current branch name)');
+      this.logger.debug(`GIT : execute "cd ${this.configuration.getCwd()} && git status`);
+      const process = exec('git status', {
+        cwd: this.configuration.getCwd(),
+      });
+
+      let outputData = '';
+
+      process.stderr.on('data', (data : any) => {
+        this.logger.debug(data);
+      });
+
+      process.stdout.on('data', (data : any) => {
+        this.logger.debug(data);
+        outputData += data;
+      });
+
+      process.on('close', (retCode : number) => {
+        resolve(GitDriver.extractBranchName(outputData));
+      });
+    });
+  }
+
   /** Returns true if the git message contains a track of a conflict * */
-  // eslint-disable-next-line class-methods-use-this
-  private hasCherryPickConflict(gitMessage : string) : boolean {
+  private static hasCherryPickConflict(gitMessage : string) : boolean {
     return gitMessage.match('conflict') !== null;
   }
 
   /** Returns true if the git message contains a track that the commit is already on the branch * */
-  // eslint-disable-next-line class-methods-use-this
-  private hasCherryPickNoAction(gitMessage : string) : boolean {
+  private static hasCherryPickNoAction(gitMessage : string) : boolean {
     return gitMessage.match('allow-empty') !== null;
+  }
+
+  /** Returns true if there is no mere, rebase or cherry-pick ongoing * */
+  private static isStatusOk(gitMessage : string) : boolean {
+    return gitMessage.match('Unmerged paths') === null
+        && gitMessage.match('fix conflicts') === null
+        && gitMessage.match('git cherry-pick --continue') === null
+        && gitMessage.match('git merge --continue') === null
+        && gitMessage.match('git rebase --continue') === null;
+  }
+
+  private static extractBranchName(gitMessage: string): string {
+    const branchNameLine = gitMessage.split('\n').filter((line: string) => line.match('On branch') !== null);
+
+    return branchNameLine[0].split(' ')[2];
   }
 }
