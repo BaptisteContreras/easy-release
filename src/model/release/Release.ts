@@ -16,6 +16,10 @@ export default class Release {
 
   private conflict : boolean;
 
+  private hadConflict: boolean;
+
+  private hadError: boolean;
+
   @Type(() => AbstractMergeRequest)
   private mrs : AbstractMergeRequest[];
 
@@ -52,6 +56,8 @@ export default class Release {
 
   private branchName: string;
 
+  private mergeStrategy: string;
+
   /**            Constructor           * */
 
   constructor() {
@@ -66,6 +72,9 @@ export default class Release {
     this.pauseEnd = null;
     this.paused = false;
     this.branchName = '';
+    this.mergeStrategy = '';
+    this.hadConflict = false;
+    this.hadError = false;
   }
 
   /**            Methods           * */
@@ -156,5 +165,29 @@ export default class Release {
 
   setBranchName(branchName: string): void {
     this.branchName = branchName;
+  }
+
+  getMergeStrategy(): string {
+    return this.mergeStrategy;
+  }
+
+  setMergeStrategy(mergeStrategy: string): void {
+    this.mergeStrategy = mergeStrategy;
+  }
+
+  getHadConflict(): boolean {
+    return this.hadConflict;
+  }
+
+  getHadError(): boolean {
+    return this.hadError;
+  }
+
+  setHadConflict(hadConflict: boolean): void {
+    this.hadConflict = this.hadConflict || hadConflict;
+  }
+
+  setHadError(hadError: boolean): void {
+    this.hadError = this.hadError || hadError;
   }
 }

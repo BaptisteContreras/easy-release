@@ -66,7 +66,7 @@ export default abstract class AbstractCommit implements MergeableElement {
     return this.getSha();
   }
 
-  hasBeenMerged() : boolean {
+  isMerged() : boolean {
     return this.merged;
   }
 

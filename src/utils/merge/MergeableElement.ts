@@ -6,5 +6,7 @@ export default interface MergeableElement {
 
   setMerged(merged : boolean) : void;
 
+  isMerged(): boolean;
+
   getInternalType(): string;
 }

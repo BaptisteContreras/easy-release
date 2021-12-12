@@ -15,4 +15,12 @@ export default interface GitMergeStrategy {
    * Returns a MergeResult object with all the information about the requested merge
    * */
   merge(element : MergeableElement) : Promise<MergeResult>;
+
+  /**
+   * Merge all element after a conflict
+   * It takes care of already merged element
+   */
+  resumeMerge(
+    mergeableCollection : MergeableElement[],
+    mergeCollectionResult: MergeCollectionResult) : Promise<void>;
 }

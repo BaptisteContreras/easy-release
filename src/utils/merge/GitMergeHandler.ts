@@ -28,4 +28,13 @@ export default class GitMergeHandler {
       default: return this.cherryPickStrategy;
     }
   }
+
+  async resumeMerge(
+    mergeableCollection : MergeableElement[],
+    mergeCollectionResult: MergeCollectionResult,
+    mergeStrategy : string,
+  ): Promise<void> {
+    return this.selectStrategy(mergeStrategy)
+      .resumeMerge(mergeableCollection, mergeCollectionResult);
+  }
 }

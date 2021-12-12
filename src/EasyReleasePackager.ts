@@ -107,13 +107,16 @@ export default class EasyReleasePackager {
       process.exit(1);
     }
 
+    release.setMergeStrategy(mergeStrategy);
     release.setElementsToMerge(elementsToMerge);
 
     const mergeResult = await this.gitMergeHandler.handleMerge(elementsToMerge, mergeStrategy);
 
     release.setMergeResult(mergeResult);
     release.setConflict(mergeResult.hasConflict());
+    release.setHadConflict(mergeResult.hasConflict());
     release.setError(mergeResult.hasError());
+    release.setHadError(mergeResult.hasError());
 
     // console.log(elementsToMerge);
 
@@ -158,6 +161,35 @@ export default class EasyReleasePackager {
         process.exit(1);
       }
 
+      const mergeResult = release.getMergeResult();
+
+      if (!mergeResult) {
+        throw new Error('No merge result found in the resumed release');
+      }
+
+      mergeResult.setError(false);
+      mergeResult.setConflict(false);
+
+      await this.gitMergeHandler.resumeMerge(
+        release.getElementsToMerge(), mergeResult, release.getMergeStrategy(),
+      );
+
+      release.setConflict(mergeResult.hasConflict());
+      release.setHadConflict(mergeResult.hasConflict());
+      release.setError(mergeResult.hasError());
+      release.setHadError(mergeResult.hasError());
+
+      // console.log(elementsToMerge);
+
+      if (release.hasConflict()) {
+        release.pause();
+        this.logger.warning('Conflict detected, resolve it then use resume option to continue the package where it stopped');
+      } else {
+        release.terminate();
+        this.logger.info('Done !');
+      }
+
+      console.log(release);
       process.exit(0);
     }
 

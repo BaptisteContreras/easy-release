@@ -14,6 +14,10 @@ export default class MergeCollectionResult {
 
   private conflict : boolean;
 
+  private hadError: boolean;
+
+  private hadConflict: boolean;
+
   @Type((item : TypeHelpOptions | undefined) => {
     const rawObject = item?.object;
 
@@ -65,6 +69,8 @@ export default class MergeCollectionResult {
     this.lastMergedElement = null;
     this.lastMergeResult = null;
     this.mergeResultCollection = [];
+    this.hadError = false;
+    this.hadConflict = false;
   }
 
   /**            Accessors           * */
@@ -107,5 +113,21 @@ export default class MergeCollectionResult {
 
   addMergeResult(mergeResult: MergeResult) {
     this.mergeResultCollection.push(mergeResult);
+  }
+
+  getHadConflict(): boolean {
+    return this.hadConflict;
+  }
+
+  getHadError(): boolean {
+    return this.hadError;
+  }
+
+  setHadConflict(hadConflict: boolean): void {
+    this.hadConflict = this.hadConflict || hadConflict;
+  }
+
+  setHadError(hadError: boolean): void {
+    this.hadError = this.hadError || hadError;
   }
 }

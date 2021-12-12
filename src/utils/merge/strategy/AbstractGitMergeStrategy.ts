@@ -18,4 +18,8 @@ export default abstract class AbstractGitMergeStrategy implements GitMergeStrate
   abstract merge(element: MergeableElement): Promise<MergeResult>;
 
   abstract mergeAll(mergeableCollection: MergeableElement[]): Promise<MergeCollectionResult>;
+
+  abstract resumeMerge(
+    mergeableCollection: MergeableElement[],
+    mergeCollectionResult: MergeCollectionResult): Promise<void>;
 }

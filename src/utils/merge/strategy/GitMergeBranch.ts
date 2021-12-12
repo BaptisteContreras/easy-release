@@ -17,4 +17,13 @@ export default class GitMergeBranch extends AbstractGitMergeStrategy {
       reject();
     });
   }
+
+  // eslint-disable-next-line class-methods-use-this
+  resumeMerge(
+    mergeableCollection : MergeableElement[], mergeCollectionResult: MergeCollectionResult,
+  ) : Promise<void> {
+    return new Promise((resolve, reject) => {
+      reject();
+    });
+  }
 }
