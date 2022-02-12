@@ -90,10 +90,18 @@ export default class ReleaseStorageHandler {
       release, FsTools.buildPath(releaseStorageDirNameFullPath, this.releaseHashFileName), null,
     );
 
-    await this.storageDriver.storeCurrent(
-      releaseStorageDirName,
-      this.getCurrentFileLocation(),
-    );
+    if (fs.existsSync(this.getCurrentFileLocation())) {
+      this.logger.debug(`Delete the old current file: ${this.getCurrentFileLocation()}`);
+      fs.rmSync(this.getCurrentFileLocation());
+      this.logger.debug('Delete the old current file done');
+    }
+
+    if (!release.isTerminated()) {
+      await this.storageDriver.storeCurrent(
+        releaseStorageDirName,
+        this.getCurrentFileLocation(),
+      );
+    }
   }
 
   async updateRelease(release : Release): Promise<void> {
@@ -144,10 +152,12 @@ export default class ReleaseStorageHandler {
       this.logger.debug('Delete the old current file done');
     }
 
-    await this.storageDriver.storeCurrent(
-      storageDirName,
-      this.getCurrentFileLocation(),
-    );
+    if (!release.isTerminated()) {
+      await this.storageDriver.storeCurrent(
+        storageDirName,
+        this.getCurrentFileLocation(),
+      );
+    }
   }
 
   /** Returns true is there is an active release that can be resume * */

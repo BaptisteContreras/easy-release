@@ -118,8 +118,6 @@ export default class EasyReleasePackager {
     release.setError(mergeResult.hasError());
     release.setHadError(mergeResult.hasError());
 
-    // console.log(elementsToMerge);
-
     if (release.hasConflict()) {
       release.pause();
       this.logger.warning('Conflict detected, resolve it then use resume option to continue the package where it stopped');
@@ -127,8 +125,6 @@ export default class EasyReleasePackager {
       release.terminate();
       this.logger.info('Done !');
     }
-
-    console.log(release);
 
     await this.releaseStorageHandler.storeRelease(release);
   }
@@ -156,7 +152,6 @@ export default class EasyReleasePackager {
 
     if (isStatusStable) {
       this.logger.info('Conflict is resolved ! Lets continue');
-      console.log(release);
 
       const currentBranchName = await this.gitDriver.getCurrentBranchName();
 
@@ -183,8 +178,6 @@ export default class EasyReleasePackager {
       release.setHadConflict(mergeResult.hasConflict());
       release.setError(mergeResult.hasError());
       release.setHadError(mergeResult.hasError());
-
-      // console.log(elementsToMerge);
 
       if (release.hasConflict()) {
         release.pause();
