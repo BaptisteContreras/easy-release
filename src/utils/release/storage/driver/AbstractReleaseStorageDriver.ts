@@ -13,11 +13,15 @@ export default abstract class AbstractReleaseStorageDriver implements ReleaseSto
   }
 
   /**            Methods           * */
-  abstract store(release: Release, location: string): void;
+  abstract store(release: Release, location: string): Promise<void>;
 
-  abstract storeHash(release: Release, location: string, hashAlgorithm: string | null): void;
+  abstract storeHash(
+    release: Release, location: string, hashAlgorithm: string | null
+  ): Promise<void>;
 
-  abstract storeCurrent(releaseDirName: string, location: string): void;
+  abstract storeCurrent(releaseDirName: string, location: string): Promise<void>;
 
   abstract readReleaseData(location: string, hashLocation: string): object;
+
+  abstract getFilesExtension(): string;
 }

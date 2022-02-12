@@ -47,7 +47,7 @@ export default class ReleaseStorageHandler {
   }
 
   /**            Methods           * */
-  storeRelease(release : Release) : void {
+  async storeRelease(release : Release) : Promise<void> {
     let releaseStorageDirName = ReleaseStorageHandler.generateReleaseStorageDirName();
     let releaseStorageDirNameFullPath = FsTools.buildPath(
       this.easyReleaseFullPath, releaseStorageDirName,
@@ -79,22 +79,79 @@ export default class ReleaseStorageHandler {
     fs.mkdirSync(releaseStorageDirNameFullPath);
     this.logger.debug('mkdir release dir OK');
 
-    this.storageDriver.store(
+    release.setStorageName(releaseStorageDirName);
+    release.setStorageExtension(this.storageDriver.getFilesExtension());
+
+    await this.storageDriver.store(
       release, FsTools.buildPath(releaseStorageDirNameFullPath, this.releaseFileName),
     );
 
-    this.storageDriver.storeHash(
+    await this.storageDriver.storeHash(
       release, FsTools.buildPath(releaseStorageDirNameFullPath, this.releaseHashFileName), null,
     );
 
-    this.storageDriver.storeCurrent(
+    await this.storageDriver.storeCurrent(
       releaseStorageDirName,
-      FsTools.buildPath(this.easyReleaseFullPath, this.currentReleaseNameFile),
+      this.getCurrentFileLocation(),
+    );
+  }
+
+  async updateRelease(release : Release): Promise<void> {
+    const storageDirName = release.getStorageName();
+    const releaseStorageDirNameFullPath = FsTools.buildPath(
+      this.easyReleaseFullPath, storageDirName,
+    );
+
+    if (!fs.existsSync(releaseStorageDirNameFullPath)) {
+      throw new Error(`Release storage directory : ${releaseStorageDirNameFullPath} doesn't exist`);
+    }
+
+    const releaseStorageFileFullPath = FsTools.buildPath(
+      releaseStorageDirNameFullPath, this.releaseFileName,
+    );
+
+    const releaseStorageFileFullPathWithExtension = `${releaseStorageFileFullPath}.${release.getStorageExtension()}`;
+
+    if (fs.existsSync(releaseStorageFileFullPathWithExtension)) {
+      this.logger.debug(`Delete the old release storage file: ${releaseStorageFileFullPathWithExtension}`);
+      fs.rmSync(releaseStorageFileFullPathWithExtension);
+      this.logger.debug('Delete the old release storage file done');
+    }
+
+    await this.storageDriver.store(
+      release, releaseStorageFileFullPath,
+    );
+
+    const releaseMetadataStorageFileFullPath = FsTools.buildPath(
+      releaseStorageDirNameFullPath, this.releaseHashFileName,
+    );
+
+    const releaseMetadataStorageFileFullPathWithExtension = `${releaseMetadataStorageFileFullPath}.${this.storageDriver.getFilesExtension()}`;
+
+    if (fs.existsSync(releaseMetadataStorageFileFullPathWithExtension)) {
+      this.logger.debug(`Delete the old release metadata storage file: ${releaseMetadataStorageFileFullPathWithExtension}`);
+      fs.rmSync(releaseMetadataStorageFileFullPathWithExtension);
+      this.logger.debug('Delete the old release metadata storage file done');
+    }
+
+    await this.storageDriver.storeHash(
+      release, releaseMetadataStorageFileFullPath, null,
+    );
+
+    if (fs.existsSync(this.getCurrentFileLocation())) {
+      this.logger.debug(`Delete the old current file: ${this.getCurrentFileLocation()}`);
+      fs.rmSync(this.getCurrentFileLocation());
+      this.logger.debug('Delete the old current file done');
+    }
+
+    await this.storageDriver.storeCurrent(
+      storageDirName,
+      this.getCurrentFileLocation(),
     );
   }
 
   /** Returns true is there is an active release that can be resume * */
-  public hasActiveRelease(): boolean {
+  hasActiveRelease(): boolean {
     if (fs.existsSync(FsTools.buildPath(this.easyReleaseFullPath, this.currentReleaseNameFile))) {
       const activeReleaseDirName = fs.readFileSync(
         FsTools.buildPath(this.easyReleaseFullPath, this.currentReleaseNameFile),
@@ -148,5 +205,9 @@ export default class ReleaseStorageHandler {
     }
 
     return easyReleaseFullPath;
+  }
+
+  private getCurrentFileLocation(): string {
+    return FsTools.buildPath(this.easyReleaseFullPath, this.currentReleaseNameFile);
   }
 }

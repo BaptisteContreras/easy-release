@@ -147,6 +147,11 @@ export default class EasyReleasePackager {
 
     this.logger.info('Release loaded');
 
+    if (release.isTerminated()) {
+      this.logger.error('This release is terminated. Cannot resume it.');
+      process.exit(1);
+    }
+
     const isStatusStable = await this.gitDriver.isGitStatusStable();
 
     if (isStatusStable) {
@@ -189,7 +194,7 @@ export default class EasyReleasePackager {
         this.logger.info('Done !');
       }
 
-      console.log(release);
+      await this.releaseStorageHandler.updateRelease(release);
       process.exit(0);
     }
 

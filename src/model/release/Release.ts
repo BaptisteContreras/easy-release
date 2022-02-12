@@ -58,6 +58,10 @@ export default class Release {
 
   private mergeStrategy: string;
 
+  private storageName: string;
+
+  private storageExtension: string;
+
   /**            Constructor           * */
 
   constructor() {
@@ -75,6 +79,8 @@ export default class Release {
     this.mergeStrategy = '';
     this.hadConflict = false;
     this.hadError = false;
+    this.storageName = '';
+    this.storageExtension = '';
   }
 
   /**            Methods           * */
@@ -189,5 +195,21 @@ export default class Release {
 
   setHadError(hadError: boolean): void {
     this.hadError = this.hadError || hadError;
+  }
+
+  setStorageName(storageName: string): void {
+    this.storageName = storageName;
+  }
+
+  getStorageName(): string {
+    return this.storageName;
+  }
+
+  setStorageExtension(storageExtension: string): void {
+    this.storageExtension = storageExtension;
+  }
+
+  getStorageExtension(): string {
+    return this.storageExtension;
   }
 }

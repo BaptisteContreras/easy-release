@@ -1,73 +1,80 @@
 import { sha512 } from 'js-sha512';
-import ReleaseStorageDriver from './ReleaseStorageDriver';
 import Release from '../../../../model/release/Release';
 import AbstractReleaseStorageDriver from './AbstractReleaseStorageDriver';
-import FsTools from '../../../tools/FsTools';
 
 const fs = require('fs');
 
 export default class JsonReleaseStorageDriver extends AbstractReleaseStorageDriver {
   /**            Methods           * */
 
-  store(release: Release, location : string): void {
-    const jsonContent = JSON.stringify(release);
-    this.logger.info(`Store release in JSON in ${location}`);
-    this.logger.debug('Release JSON content');
-    this.logger.debug(jsonContent);
+  store(release: Release, location : string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const jsonContent = JSON.stringify(release);
+      this.logger.info(`Store release in JSON in ${location}`);
+      this.logger.debug('Release JSON content');
+      this.logger.debug(jsonContent);
 
-    fs.writeFile(`${location}.json`, jsonContent, (err : any) => {
-      if (err) {
-        this.logger.error('save release on disk failed with the following error');
-        this.logger.error(err);
-        process.exit(1);
-      }
-      this.logger.info('Release saved on disk !');
+      fs.writeFile(`${location}.${this.getFilesExtension()}`, jsonContent, (err : any) => {
+        if (err) {
+          this.logger.error('save release on disk failed with the following error');
+          this.logger.error(err);
+          process.exit(1);
+        }
+        this.logger.info('Release saved on disk !');
+        resolve();
+      });
     });
   }
 
-  storeHash(release: Release, location: string, hashAlgorithm: string | null): void {
-    const releaseHash = sha512(JSON.stringify(release));
-    const jsonContent = {
-      date: new Date(),
-      algorithm: 'sha512',
-      hash: releaseHash,
-      metaHash: '',
-    };
+  storeHash(release: Release, location: string, hashAlgorithm: string | null): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const releaseHash = sha512(JSON.stringify(release));
+      const jsonContent = {
+        date: new Date(),
+        algorithm: 'sha512',
+        hash: releaseHash,
+        metaHash: '',
+      };
 
-    this.logger.info(`Store release hash in JSON in ${location}`);
-    this.logger.debug(`Release SHA512 hash is ${releaseHash}`);
+      this.logger.info(`Store release hash in JSON in ${location}`);
+      this.logger.debug(`Release SHA512 hash is ${releaseHash}`);
 
-    const metaHash = sha512(JSON.stringify(jsonContent));
+      const metaHash = sha512(JSON.stringify(jsonContent));
 
-    this.logger.debug(`Meta SHA512 hash is ${metaHash}`);
+      this.logger.debug(`Meta SHA512 hash is ${metaHash}`);
 
-    jsonContent.metaHash = metaHash;
+      jsonContent.metaHash = metaHash;
 
-    fs.writeFile(`${location}.json`, JSON.stringify(jsonContent), (err : any) => {
-      if (err) {
-        this.logger.error('save release hash on disk failed with the following error');
-        this.logger.error(err);
-        process.exit(1);
-      }
-      this.logger.info('Release hash saved on disk ! ');
+      fs.writeFile(`${location}.${this.getFilesExtension()}`, JSON.stringify(jsonContent), (err : any) => {
+        if (err) {
+          this.logger.error('save release hash on disk failed with the following error');
+          this.logger.error(err);
+          process.exit(1);
+        }
+        this.logger.info('Release hash saved on disk ! ');
+        resolve();
+      });
     });
   }
 
-  storeCurrent(releaseDirName: string, location: string): void {
-    this.logger.debug(`Store current release dir name (${releaseDirName}) in current file located at ${location}`);
-    fs.writeFile(location, releaseDirName, (err : any) => {
-      if (err) {
-        this.logger.error('Store current release dir name failed with the following error');
-        this.logger.error(err);
-        process.exit(1);
-      }
-      this.logger.info('Current release name saved !');
+  storeCurrent(releaseDirName: string, location: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.logger.debug(`Store current release dir name (${releaseDirName}) in current file located at ${location}`);
+      fs.writeFile(location, releaseDirName, (err : any) => {
+        if (err) {
+          this.logger.error('Store current release dir name failed with the following error');
+          this.logger.error(err);
+          process.exit(1);
+        }
+        this.logger.info('Current release name saved !');
+        resolve();
+      });
     });
   }
 
   readReleaseData(location: string, hashLocation: string): object {
-    const fullLocation = `${location}.json`;
-    const fullHashLocation = `${hashLocation}.json`;
+    const fullLocation = `${location}.${this.getFilesExtension()}`;
+    const fullHashLocation = `${hashLocation}.${this.getFilesExtension()}`;
     this.logger.debug(`Read data in ${fullLocation}`);
     this.logger.debug(`Read hash in ${fullHashLocation}`);
     const rawData = fs.readFileSync(fullLocation, {
@@ -98,5 +105,10 @@ export default class JsonReleaseStorageDriver extends AbstractReleaseStorageDriv
     this.logger.debug('Data ok');
 
     return parsedData;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  getFilesExtension(): string {
+    return 'json';
   }
 }
