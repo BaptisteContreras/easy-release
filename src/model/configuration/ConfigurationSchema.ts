@@ -49,6 +49,11 @@ const schemaDeclaration = {
     required: false,
     type: 'string',
   } as ConfigurationSchema,
+  PUSH: {
+    name: 'PUSH',
+    required: false,
+    type: 'boolean',
+  } as ConfigurationSchema,
 };
 
 export interface ConfigurationSchema {
@@ -68,6 +73,7 @@ export interface RawConfiguration {
   BASE_RELEASE_BRANCH : string,
   MERGE_STRATEGY : string,
   EASYRELEASE_DIR_NAME : string,
+  PUSH : boolean,
 }
 
 export default schemaDeclaration;

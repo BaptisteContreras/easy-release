@@ -122,8 +122,13 @@ export default class EasyReleasePackager {
       release.pause();
       this.logger.warning('Conflict detected, resolve it then use resume option to continue the package where it stopped');
     } else {
+      if (this.configuration.canPush()) {
+        this.logger.info('Lets push the release branch');
+        await this.gitDriver.pushBranch(release.getBranchName());
+      } else {
+        this.logger.info('The release branch is not pushed');
+      }
       release.terminate();
-      this.logger.info('Done !');
     }
 
     await this.releaseStorageHandler.storeRelease(release);
@@ -183,12 +188,19 @@ export default class EasyReleasePackager {
         release.pause();
         this.logger.warning('Conflict detected, resolve it then use resume option to continue the package where it stopped');
       } else {
+        if (this.configuration.canPush()) {
+          this.logger.info('Lets push the release branch');
+          await this.gitDriver.pushBranch(release.getBranchName());
+        } else {
+          this.logger.info('The release branch is not pushed');
+        }
         release.terminate();
         this.logger.info('Done !');
       }
 
       await this.releaseStorageHandler.updateRelease(release);
-      process.exit(0);
+
+      return;
     }
 
     this.logger.error('Conflict is not resolved ! We stop here');
@@ -260,7 +272,7 @@ export default class EasyReleasePackager {
     }
 
     this.logger.info('Continuing delivery process with the remaining MRs');
-    this.displayer.displayMrToDeliver(mrsToDeliver);
+    this.displayer.displayMrToDeliver(mrsSelected);
 
     return mrsSelected;
   }

@@ -17,6 +17,7 @@ export interface CliOptions {
   configurationFileExtension : string,
   release : boolean,
   resume : boolean,
+  push : string,
 }
 
 const optionsCliDefinition = [
@@ -85,7 +86,12 @@ const optionsCliDefinition = [
     required: false,
     description: 'Resume the release process',
   } as OptionDefinitionElement,
+  {
+    name: 'push',
+    type: String,
+    required: false,
+    description: 'If set to "true", git push the release branch',
+  } as OptionDefinitionElement,
 ];
-// type CliOption =
 
 export const optionsCliDefinitions = optionsCliDefinition;

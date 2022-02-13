@@ -164,6 +164,35 @@ export default class GitDriver {
     });
   }
 
+  pushBranch(branchName: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.logger.info(`git push current branch (${branchName})`);
+      this.logger.debug(`GIT : execute "cd ${this.configuration.getCwd()} && git push origin ${branchName}`);
+      const process = exec(`git push origin ${branchName}`, {
+        cwd: this.configuration.getCwd(),
+      });
+
+      let outputData = '';
+
+      process.stderr.on('data', (data : any) => {
+        this.logger.debug(data);
+      });
+
+      process.stdout.on('data', (data : any) => {
+        this.logger.debug(data);
+        outputData += data;
+      });
+
+      process.on('close', (retCode : number) => {
+        if (retCode !== 0) {
+          throw new Error('git push return code is not 0');
+        }
+
+        resolve(true);
+      });
+    });
+  }
+
   /** Returns true if the git message contains a track of a conflict * */
   private static hasCherryPickConflict(gitMessage : string) : boolean {
     return gitMessage.match('conflict') !== null;

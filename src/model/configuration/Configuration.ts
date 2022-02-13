@@ -29,11 +29,13 @@ export default class Configuration {
 
   private easyreleaseDirName : string;
 
+  private push : boolean;
+
   /**            Constructor           * */
   constructor(
     vcsConfiguration: AbstractVcsConfiguration, labelsDeliver : string[],
     releaseBranchName : string, baseReleaseBranch : string,
-    mergeStrategy : string, easyreleaseDirName : string,
+    mergeStrategy : string, easyreleaseDirName : string, push : boolean,
   ) {
     this.vcsConfiguration = vcsConfiguration;
     this.verbose = false;
@@ -47,6 +49,7 @@ export default class Configuration {
     this.baseReleaseBranch = baseReleaseBranch;
     this.mergeStrategy = mergeStrategy;
     this.easyreleaseDirName = easyreleaseDirName;
+    this.push = push;
   }
 
   /**            Methods           * */
@@ -60,6 +63,7 @@ export default class Configuration {
       parsedConfiguration.RELEASE_BRANCH_NAME, parsedConfiguration.BASE_RELEASE_BRANCH,
       parsedConfiguration.MERGE_STRATEGY,
       parsedConfiguration.EASYRELEASE_DIR_NAME ? parsedConfiguration.EASYRELEASE_DIR_NAME : '.easyrelease',
+      parsedConfiguration.PUSH,
     );
   }
 
@@ -71,6 +75,10 @@ export default class Configuration {
     this.profile = cliOptions.profile;
     this.resume = cliOptions.resume;
     this.release = cliOptions.release;
+
+    if (cliOptions.push !== undefined) {
+      this.push = cliOptions.push.toUpperCase() === 'TRUE';
+    }
 
     return this;
   }
@@ -118,5 +126,9 @@ export default class Configuration {
 
   getEasyreleaseDirName() : string {
     return this.easyreleaseDirName;
+  }
+
+  canPush(): boolean {
+    return this.push;
   }
 }

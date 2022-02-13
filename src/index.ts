@@ -45,4 +45,4 @@ const packager = MainFactory.createApplication(configuration, logger);
 
 console.log(configuration);
 
-packager.run();
+packager.run().finally(() => process.exit(0));
