@@ -31,6 +31,8 @@ export default class Configuration {
 
   private push : boolean;
 
+  private append: boolean;
+
   /**            Constructor           * */
   constructor(
     vcsConfiguration: AbstractVcsConfiguration, labelsDeliver : string[],
@@ -45,6 +47,7 @@ export default class Configuration {
     this.profile = 'recette';
     this.release = false;
     this.resume = false;
+    this.append = false;
     this.releaseBranchName = releaseBranchName;
     this.baseReleaseBranch = baseReleaseBranch;
     this.mergeStrategy = mergeStrategy;
@@ -75,6 +78,7 @@ export default class Configuration {
     this.profile = cliOptions.profile;
     this.resume = cliOptions.resume;
     this.release = cliOptions.release;
+    this.append = cliOptions.append;
 
     if (cliOptions.push !== undefined) {
       this.push = cliOptions.push.toUpperCase() === 'TRUE';
@@ -130,5 +134,9 @@ export default class Configuration {
 
   canPush(): boolean {
     return this.push;
+  }
+
+  isAppend(): boolean {
+    return this.append;
   }
 }

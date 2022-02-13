@@ -193,6 +193,35 @@ export default class GitDriver {
     });
   }
 
+  fetchAll(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.logger.info('git fetch all changes');
+      this.logger.debug(`GIT : execute "cd ${this.configuration.getCwd()} && git fetch --all`);
+      const process = exec('git fetch --all', {
+        cwd: this.configuration.getCwd(),
+      });
+
+      let outputData = '';
+
+      process.stderr.on('data', (data : any) => {
+        this.logger.debug(data);
+      });
+
+      process.stdout.on('data', (data : any) => {
+        this.logger.debug(data);
+        outputData += data;
+      });
+
+      process.on('close', (retCode : number) => {
+        if (retCode !== 0) {
+          throw new Error('git fetch --all return code is not 0');
+        }
+
+        resolve(true);
+      });
+    });
+  }
+
   /** Returns true if the git message contains a track of a conflict * */
   private static hasCherryPickConflict(gitMessage : string) : boolean {
     return gitMessage.match('conflict') !== null;

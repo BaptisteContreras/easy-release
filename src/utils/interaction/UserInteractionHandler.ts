@@ -23,4 +23,7 @@ export default interface UserInteractionHandler {
   /** This methods returns true if the user wants to resume an active release */
   handleAskUserIfHeWantsToResumeTheActiveRelease(activeReleaseName: string) : Promise<boolean>;
 
+  /** This method ask the user to enter the branch name to append new commits * */
+  handleAskUserToSelectBranchNameToAppend() : Promise<string>;
+
 }

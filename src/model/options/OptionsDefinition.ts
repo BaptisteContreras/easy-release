@@ -18,6 +18,7 @@ export interface CliOptions {
   release : boolean,
   resume : boolean,
   push : string,
+  append : boolean,
 }
 
 const optionsCliDefinition = [
@@ -91,6 +92,12 @@ const optionsCliDefinition = [
     type: String,
     required: false,
     description: 'If set to "true", git push the release branch',
+  } as OptionDefinitionElement,
+  {
+    name: 'append',
+    type: Boolean,
+    required: false,
+    description: 'Append new commit to an existing release branch',
   } as OptionDefinitionElement,
 ];
 

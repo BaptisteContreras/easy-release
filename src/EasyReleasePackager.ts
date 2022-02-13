@@ -207,6 +207,80 @@ export default class EasyReleasePackager {
     process.exit(1);
   }
 
+  async appendPackage() : Promise<void> {
+    if (await this.checkForActiveRelease()) {
+      await this.resumePackage(true);
+
+      return;
+    }
+
+    this.logger.info('Please select a branch to append commits');
+    const branchNameToAppend = await this.userInteractionHandler
+      .handleAskUserToSelectBranchNameToAppend();
+
+    this.logger.info(`You chose ${branchNameToAppend} as the branch to append new commits`);
+
+    await this.gitDriver.fetchAll();
+    await this.gitDriver.checkoutAndPullBaseBranch(branchNameToAppend);
+
+    const release = new Release();
+
+    this.logger.info('Fetch MR to deliver');
+    let mrsToDeliver = await this.repository.getMrToDeliver(
+      this.configuration.getLabelsDeliver(),
+    );
+
+    this.logger.info(`${mrsToDeliver.length} MR to deliver found`);
+    this.canContinueDeliveryProcess(mrsToDeliver);
+
+    this.displayer.displayMrToDeliver(mrsToDeliver);
+
+    mrsToDeliver = await this.handleMRSelection(mrsToDeliver);
+
+    release.setMr(mrsToDeliver);
+
+    release.setBranchName(branchNameToAppend);
+
+    const mergeStrategy = await this.userInteractionHandler
+      .handleAskUserToChangeMergeStrategy(this.configuration.getMergeStrategy());
+
+    let elementsToMerge : MergeableElement[] = [];
+    if (mergeStrategy === MergeStrategy.CHERRY_PICK) {
+      elementsToMerge = await this.handleCommitSelection(
+        await this.repository.getCommitsToCherryPick(mrsToDeliver),
+      );
+    } else {
+      this.logger.error('BRANCH MERGE IS NOT IMPLEMENTED YET');
+      process.exit(1);
+    }
+
+    release.setMergeStrategy(mergeStrategy);
+    release.setElementsToMerge(elementsToMerge);
+
+    const mergeResult = await this.gitMergeHandler.handleMerge(elementsToMerge, mergeStrategy);
+
+    release.setMergeResult(mergeResult);
+    release.setConflict(mergeResult.hasConflict());
+    release.setHadConflict(mergeResult.hasConflict());
+    release.setError(mergeResult.hasError());
+    release.setHadError(mergeResult.hasError());
+
+    if (release.hasConflict()) {
+      release.pause();
+      this.logger.warning('Conflict detected, resolve it then use resume option to continue the package where it stopped');
+    } else {
+      if (this.configuration.canPush()) {
+        this.logger.info('Lets push the release branch');
+        await this.gitDriver.pushBranch(release.getBranchName());
+      } else {
+        this.logger.info('The release branch is not pushed');
+      }
+      release.terminate();
+    }
+
+    await this.releaseStorageHandler.storeRelease(release);
+  }
+
   async run() : Promise<void> {
     this.logger.info('EasyReleasePackager run');
     await this.selectAction();
@@ -221,6 +295,9 @@ export default class EasyReleasePackager {
     } else if (this.configuration.isResume()) {
       this.logger.info('resume action');
       await this.resumePackage();
+    } else if (this.configuration.isAppend()) {
+      this.logger.info('append action');
+      await this.appendPackage();
     } else {
       this.logger.info('default action : release');
       await this.startPackage();

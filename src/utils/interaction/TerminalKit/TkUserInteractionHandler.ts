@@ -132,4 +132,17 @@ export default class TkUserInteractionHandler implements UserInteractionHandler 
       });
     });
   }
+
+  // eslint-disable-next-line class-methods-use-this
+  async handleAskUserToSelectBranchNameToAppend(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      term.cyan('Enter the release branch name : \n');
+      term.inputField(
+        (inputError : any, input : any) => {
+          term.cyan('\n');
+          resolve(input);
+        },
+      );
+    });
+  }
 }
