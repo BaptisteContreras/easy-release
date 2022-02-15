@@ -27,6 +27,7 @@ export default abstract class AbstractVcsRepository {
     const mrList = await this.vcsDriver.getOpenMrs();
     await Promise.all(mrList.map(async (mr) => {
       const issue = await this.vcsDriver.getLinkedIssue(mr);
+      this.logger.debug(`[MR DEBUG] ${issue?.getNumber()}`);
       if (issue) {
         mr.setLinkedIssue(issue);
         this.logger.debug(`Link issue #${issue.getNumber()} to MR ${mr.getTitle()}`);

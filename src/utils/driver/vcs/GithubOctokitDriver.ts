@@ -111,6 +111,8 @@ export default class GithubOctokitDriver implements AbstractVcsPlatformDriver {
     }
 
     this.logger.debug(`body match : ${bodyMatchs.length}`);
+    this.logger.debug(`[DEBUG] body match 2 : ${bodyMatchs[0]}`);
+    this.logger.debug(`[DEBUG] body match 3: ${bodyMatchs[0].match('[1-9]+')}`);
     if (bodyMatchs.length > 1) {
       this.logger.warning(`${'Several linked issue ID found in a Github'
       + 'PR body : The first one will be chosen. PR body dump : ['}${githubPrBody}]`);
