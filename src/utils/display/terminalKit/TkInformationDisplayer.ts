@@ -23,7 +23,7 @@ export default class TkInformationDisplayer implements InformationDisplayer {
       borderAttr: { color: 'blue' },
       textAttr: { bgColor: 'default' },
       width: 100,
-      fit: false,
+      fit: true,
       height: mrsToDeliver.length > 1 ? 3 * mrsToDeliver.length : 5,
     });
   }

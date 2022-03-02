@@ -85,40 +85,53 @@ export default class GithubOctokitDriver implements AbstractVcsPlatformDriver {
 
   // eslint-disable-next-line class-methods-use-this
   async getOpenMrs(): Promise<AbstractMergeRequest[]> {
-    const prs = await this.octokitClient.rest.pulls.list({
-      owner: this.organisationName,
-      repo: this.repositoryName,
-      state: 'open',
-    });
-    const prList : AbstractMergeRequest[] = [];
+    // eslint-disable-next-line no-useless-catch
+    try {
+      const prs = await this.octokitClient.rest.pulls.list({
+        owner: this.organisationName,
+        repo: this.repositoryName,
+        state: 'open',
+      });
+      const prList : AbstractMergeRequest[] = [];
 
-    prs.data.forEach((el : any) => {
-      prList.push(
-        OctokitBuilder.buildMr(el, this.extractIssueIdFromPrBody(el.body)),
-      );
-    });
+      prs.data.forEach((el : any) => {
+        prList.push(
+          OctokitBuilder.buildMr(el, this.extractIssueIdFromPrBody(el.body)),
+        );
+      });
 
-    return prList;
+      return prList;
+    } catch (e) {
+      this.logger.critical(e);
+      throw e;
+    }
   }
 
   /** Return the linked issue's id contained in the body of the PR
    *  (# followed by the id : #1 * */
   private extractIssueIdFromPrBody(githubPrBody : string) : string {
-    const bodyMatchs = githubPrBody.match('#[1-9][0-9]*');
+    let bodyMatchs = githubPrBody.match('#[1-9][0-9]*');
 
     if (bodyMatchs === null) {
-      return '';
+      this.logger.debug('No issue linked with # in body. Trying to find a full issue github URL');
+      bodyMatchs = githubPrBody.match('/issues/[1-9][0-9]*');
+      if (!bodyMatchs) {
+        this.logger.warning('Unable to find an issue ID in the given PR body');
+        this.logger.debug(githubPrBody);
+
+        return '';
+      }
     }
 
     this.logger.debug(`body match : ${bodyMatchs.length}`);
     this.logger.debug(`[DEBUG] body match 2 : ${bodyMatchs[0]}`);
-    this.logger.debug(`[DEBUG] body match 3: ${bodyMatchs[0].match('[1-9]+')}`);
+    this.logger.debug(`[DEBUG] body match 3: ${bodyMatchs[0].match('[1-9][0-9]*')}`);
     if (bodyMatchs.length > 1) {
       this.logger.warning(`${'Several linked issue ID found in a Github'
       + 'PR body : The first one will be chosen. PR body dump : ['}${githubPrBody}]`);
     }
 
-    const realId = bodyMatchs[0].match('[1-9]+');
+    const realId = bodyMatchs[0].match('[1-9][0-9]*');
     return realId !== null ? realId[0] : '';
   }
 }
